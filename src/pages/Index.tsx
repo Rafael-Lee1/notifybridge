@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { v4 as uuidv4 } from 'uuid';
@@ -17,18 +16,14 @@ const Index = () => {
   const [consumerActive, setConsumerActive] = useState(true);
   const [processingDelay, setProcessingDelay] = useState(2000);
 
-  // Process messages from the queue when consumer is active
   useEffect(() => {
     if (!consumerActive || queuedMessages.length === 0) return;
 
     const timer = setTimeout(() => {
-      // Take the first message from the queue
       const [nextMessage, ...remainingMessages] = queuedMessages;
       
-      // Remove message from queue
       setQueuedMessages(remainingMessages);
       
-      // Add to consumed messages
       const newMessage: Message = {
         id: uuidv4(),
         content: nextMessage,
@@ -45,9 +40,7 @@ const Index = () => {
     return () => clearTimeout(timer);
   }, [queuedMessages, consumerActive, processingDelay]);
 
-  // Function to handle sending a new message
   const handleSendMessage = (content: string) => {
-    // Create a new producer message
     const newMessage: Message = {
       id: uuidv4(),
       content,
@@ -56,10 +49,7 @@ const Index = () => {
       status: 'delivered'
     };
     
-    // Add to message list
     setMessages(prev => [newMessage, ...prev]);
-    
-    // Add to queue
     setQueuedMessages(prev => [...prev, content]);
   };
 
@@ -91,7 +81,10 @@ const Index = () => {
           </div>
           
           <div className="lg:col-span-2 flex items-center justify-center">
-            <MessageFlow isActive={queuedMessages.length > 0 || consumerActive} />
+            <MessageFlow 
+              isActive={queuedMessages.length > 0 || consumerActive} 
+              messageCount={queuedMessages.length}
+            />
           </div>
           
           <div className="lg:col-span-5">

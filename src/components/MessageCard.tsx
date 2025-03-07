@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { CheckCircle, Clock, AlertCircle, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface MessageCardProps {
@@ -22,30 +23,60 @@ const MessageCard: React.FC<MessageCardProps> = ({
 }) => {
   const isProducer = type === 'producer';
   
+  const getStatusIcon = () => {
+    switch (status) {
+      case 'pending':
+        return <Clock className="w-4 h-4 text-yellow-500" />;
+      case 'delivered':
+        return <CheckCircle className="w-4 h-4 text-blue-500" />;
+      case 'consumed':
+        return <CheckCircle className="w-4 h-4 text-green-500" />;
+      default:
+        return <AlertCircle className="w-4 h-4 text-red-500" />;
+    }
+  };
+
+  const getStatusColor = () => {
+    switch (status) {
+      case 'pending':
+        return "border-l-yellow-500";
+      case 'delivered':
+        return "border-l-blue-500";
+      case 'consumed':
+        return "border-l-green-500";
+      default:
+        return "border-l-red-500";
+    }
+  };
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
+      whileHover={{ scale: 1.02 }}
+      transition={{ duration: 0.2 }}
       className={cn(
-        "rounded-lg p-4 border mb-3 max-w-md",
+        "rounded-lg p-4 border mb-3 max-w-md border-l-4 shadow-sm hover:shadow-md transition-all",
+        getStatusColor(),
         isProducer ? "bg-white" : "bg-secondary",
         className
       )}
     >
       <div className="flex items-start justify-between mb-2">
         <div className="flex items-center gap-2">
-          <div className={cn(
-            "w-2 h-2 rounded-full",
-            status === 'pending' ? "bg-yellow-500" :
-            status === 'delivered' ? "bg-blue-500" :
-            "bg-green-500"
-          )}></div>
+          <MessageSquare className={cn(
+            "w-4 h-4",
+            isProducer ? "text-primary" : "text-foreground"
+          )} />
           <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
             {isProducer ? 'Producer' : 'Consumer'}
           </span>
         </div>
-        <span className="text-xs text-muted-foreground">{timestamp}</span>
+        <span className="text-xs text-muted-foreground flex items-center gap-1">
+          <Clock className="w-3 h-3" />
+          {timestamp}
+        </span>
       </div>
       
       <div className="mb-2">
@@ -53,8 +84,11 @@ const MessageCard: React.FC<MessageCardProps> = ({
       </div>
       
       <div className="flex items-center justify-between text-xs text-muted-foreground">
-        <span>ID: {id.substring(0, 8)}...</span>
-        <span className="capitalize">{status}</span>
+        <span className="font-mono">{id.substring(0, 8)}...</span>
+        <div className="flex items-center gap-1">
+          {getStatusIcon()}
+          <span className="capitalize">{status}</span>
+        </div>
       </div>
     </motion.div>
   );
