@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
@@ -10,11 +10,23 @@ import MessageFlow from '@/components/MessageFlow';
 import MessageList, { Message } from '@/components/MessageList';
 import ConfigPanel from '@/components/ConfigPanel';
 
+const MAX_MESSAGE_HISTORY = 100;
+
 const Index = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(() => {
+    const savedMessages = localStorage.getItem('messageHistory');
+    return savedMessages ? JSON.parse(savedMessages) : [];
+  });
+  
   const [queuedMessages, setQueuedMessages] = useState<string[]>([]);
   const [consumerActive, setConsumerActive] = useState(true);
   const [processingDelay, setProcessingDelay] = useState(2000);
+  const [sentMessageHistory, setSentMessageHistory] = useState<string[]>([]);
+  
+  useEffect(() => {
+    const recentMessages = messages.slice(0, MAX_MESSAGE_HISTORY);
+    localStorage.setItem('messageHistory', JSON.stringify(recentMessages));
+  }, [messages]);
 
   useEffect(() => {
     if (!consumerActive || queuedMessages.length === 0) return;
@@ -51,7 +63,43 @@ const Index = () => {
     
     setMessages(prev => [newMessage, ...prev]);
     setQueuedMessages(prev => [...prev, content]);
+    
+    setSentMessageHistory(prev => {
+      if (!prev.includes(content)) {
+        return [content, ...prev].slice(0, 10);
+      }
+      return prev;
+    });
   };
+  
+  const handleClearMessages = useCallback((type?: 'producer' | 'consumer') => {
+    if (!type) {
+      setMessages([]);
+      toast.info("All message history cleared");
+      return;
+    }
+    
+    setMessages(prev => prev.filter(message => message.type !== type));
+    toast.info(`${type === 'producer' ? 'Sent' : 'Received'} message history cleared`);
+  }, []);
+
+  const handleBatchProcess = useCallback(() => {
+    if (queuedMessages.length === 0) return;
+    
+    toast.info(`Processing all ${queuedMessages.length} queued messages...`);
+    
+    const newMessages = queuedMessages.map(content => ({
+      id: uuidv4(),
+      content,
+      timestamp: new Date().toLocaleTimeString(),
+      type: 'consumer' as const,
+      status: 'consumed' as const
+    }));
+    
+    setMessages(prev => [...newMessages, ...prev]);
+    setQueuedMessages([]);
+    toast.success(`Successfully processed ${newMessages.length} messages`);
+  }, [queuedMessages]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -77,7 +125,10 @@ const Index = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
           <div className="lg:col-span-5">
-            <ProducerPanel onSendMessage={handleSendMessage} />
+            <ProducerPanel 
+              onSendMessage={handleSendMessage} 
+              recentMessages={sentMessageHistory}
+            />
           </div>
           
           <div className="lg:col-span-2 flex items-center justify-center">
@@ -94,13 +145,18 @@ const Index = () => {
               messageCount={queuedMessages.length}
               processingDelay={processingDelay}
               onProcessingDelayChange={setProcessingDelay}
+              onBatchProcess={handleBatchProcess}
             />
           </div>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div className="lg:col-span-5 h-80">
-            <MessageList messages={messages} type="producer" />
+            <MessageList 
+              messages={messages} 
+              type="producer" 
+              onClearMessages={() => handleClearMessages('producer')}
+            />
           </div>
           
           <div className="lg:col-span-2">
@@ -108,7 +164,11 @@ const Index = () => {
           </div>
           
           <div className="lg:col-span-5 h-80">
-            <MessageList messages={messages} type="consumer" />
+            <MessageList 
+              messages={messages} 
+              type="consumer" 
+              onClearMessages={() => handleClearMessages('consumer')}
+            />
           </div>
         </div>
       </motion.main>
