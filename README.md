@@ -1,69 +1,118 @@
-# Welcome to your Lovable project
+<p align="center">
+  <img width="460" height="300" src="https://github.com/Rafael-Lee1/Icons/blob/c4bc7ef90014f37d39225d538dd609d9a033624a/message_typescript.png">
+</p>
 
-## Project info
+# Interactive Messaging System Simulation
 
-**URL**: https://lovable.dev/projects/1cefc527-0b4a-4d23-8682-999bc18bbee4
+## Overview
 
-## How can I edit this code?
+Este projeto é uma aplicação de simulação interativa de sistemas de mensagens, desenvolvida para demonstrar e visualizar operações de message brokers. Ele fornece uma interface completa para simular padrões de produtores/consumidores em sistemas de filas de mensagens, servindo como uma ferramenta educativa para entender os conceitos de comunicação assíncrona em sistemas distribuídos.
 
-There are several ways of editing your application.
+## Core Features
 
-**Use Lovable**
+### Message Production and Consumption
+- **Painel do Produtor:** Interface visual intuitiva para envio de mensagens.
+- **Painel do Consumidor:** Permite ajuste de velocidade de processamento para simular diferentes cenários.
+- **Visualização em Tempo Real:** Feedback instantâneo sobre a entrega e consumo de mensagens.
+- **Simulação de Fila:** Demonstração do enfileiramento e processamento das mensagens.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/1cefc527-0b4a-4d23-8682-999bc18bbee4) and start prompting.
+### Message Broker Configuration
+- **Suporte a Múltiplos Brokers:** Configurável para trabalhar com:
+  - [RabbitMQ](https://www.rabbitmq.com/)
+  - [Kafka](https://kafka.apache.org/)
+  - [ActiveMQ](https://activemq.apache.org/)
+- **Modos de Persistência:** Escolha entre armazenamento em memória ou em disco.
+- **Configuração de Exchanges:** Suporta tipos direct, topic e fanout.
+- **Opções Avançadas:** Configurações para compressão de mensagens e retenção de dados.
 
-Changes made via Lovable will be committed automatically to this repo.
+### Visualization and Monitoring
+- **Dashboard de Métricas:** Exibição de métricas em tempo real de mensagens e monitoramento do uso de recursos (CPU, memória).
+- **Visualizações do Fluxo de Mensagens:** Desde visualizações básicas até as mais avançadas.
+- **Histórico:** Acompanhamento do throughput de mensagens ao longo do tempo.
 
-**Use your preferred IDE**
+### Authentication and Security
+- **Controle de Acesso Baseado em Papéis:** Diferentes níveis de acesso (admin, user, viewer) com rotas protegidas.
+- **Autenticação de Usuário:** Funcionalidade de login e registro, com tratamento adequado para acessos não autorizados.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Documentation
+- **Documentação Abrangente:** Seção completa com guias de início rápido, explicações de recursos e manuais administrativos.
+- **Pesquisa e Categorias:** Documentação organizada e pesquisável para facilitar a navegação.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Message History and Management
+- **Histórico Persistente:** Armazenamento local para registro contínuo das mensagens.
+- **Arquivamento e Processamento em Lote:** Capacidade de arquivar mensagens e processar lotes de mensagens enfileiradas.
+- **Logs Separados:** Registros distintos para atividades do produtor e do consumidor.
 
-Follow these steps:
+## Tecnologias Utilizadas
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Frontend Framework
+- **React com TypeScript:** Desenvolvimento de interfaces robustas com tipagem estática para maior segurança.  
+  - [React Documentation](https://reactjs.org/)  
+  - [TypeScript Documentation](https://www.typescriptlang.org/)
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### UI Components e Estilização
+- **Tailwind CSS:** Framework para estilização responsiva e moderna.  
+  - [Tailwind CSS](https://tailwindcss.com/)
+- **Shadcn UI:** Biblioteca de componentes reutilizáveis e consistentes.
+- **Framer Motion:** Para animações e transições suaves na interface.  
+  - [Framer Motion](https://www.framer.com/motion/)
+- **Lucide Icons:** Conjunto de ícones de alta qualidade para aprimorar a interface visual.
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Gerenciamento de Estado e Manipulação de Dados
+- **React Context API:** Gerenciamento de estado global da aplicação.
+- **React Query:** Para busca, cache e sincronização de dados.
+- **Local Storage:** Persistência dos dados entre sessões.
+- **Hooks Personalizados:** Compartilhamento de funcionalidades e lógica reutilizável.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+### Experiência do Desenvolvedor
+- **Vite:** Ferramenta de desenvolvimento rápida para build e hot-reloading.  
+  - [Vite](https://vitejs.dev/)
+- **UUID:** Utilizado para a geração de identificadores únicos.
 
-**Edit a file directly in GitHub**
+## Getting Started
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Prerequisites
+- Node.js (v14 ou superior)
+- npm ou yarn
 
-**Use GitHub Codespaces**
+### Instalação
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/seu-usuario/seu-repo.git
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+2. Acesse o diretório do projeto:
+   ```bash
+   cd seu-repo
 
-## What technologies are used for this project?
+3. Instale as dependências:
+   ```bash
+   npm install
+   # ou
+   npm install
 
-This project is built with .
+4. Inicie o servidor de desenvolvimento:
+   ```bash
+   npm run dev
+   # ou
+   yarn dev
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Uso
+Após iniciar o servidor de desenvolvimento, abra seu navegador e acesse http://localhost:3000 para explorar a simulação interativa do sistema de mensagens. Utilize o painel do produtor para enviar mensagens e o painel do consumidor para ajustar a velocidade de processamento. Acompanhe as métricas em tempo real e visualize detalhadamente o fluxo das mensagens.
 
-## How can I deploy this project?
+### Contribuição
+Contribuições são bem-vindas! Consulte o arquivo CONTRIBUTING.md para mais informações sobre como colaborar com este projeto.
 
-Simply open [Lovable](https://lovable.dev/projects/1cefc527-0b4a-4d23-8682-999bc18bbee4) and click on Share -> Publish.
+### License
+Este projeto está licenciado sob a MIT License.
 
-## I want to use a custom domain - is that possible?
+## Referências
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+- [RabbitMQ Official Website](https://www.rabbitmq.com/)
+- [Apache Kafka Official Website](https://kafka.apache.org/)
+- [Apache ActiveMQ Official Website](https://activemq.apache.org/)
+- [React Documentation](https://reactjs.org/)
+- [TypeScript Documentation](https://www.typescriptlang.org/)
+- [Tailwind CSS Documentation](https://tailwindcss.com/)
+- [Framer Motion Documentation](https://www.framer.com/motion/)
+- [Vite Documentation](https://vitejs.dev/)
+
