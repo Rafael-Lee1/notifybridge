@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { v4 as uuidv4 } from 'uuid';
@@ -10,24 +11,46 @@ import MessageFlow from '@/components/MessageFlow';
 import MessageList, { Message } from '@/components/MessageList';
 import ConfigPanel from '@/components/ConfigPanel';
 
+// Maximum number of messages to store in history
 const MAX_MESSAGE_HISTORY = 100;
 
 const Index = () => {
+  // Load messages from localStorage on initial render
   const [messages, setMessages] = useState<Message[]>(() => {
-    const savedMessages = localStorage.getItem('messageHistory');
-    return savedMessages ? JSON.parse(savedMessages) : [];
+    try {
+      const savedMessages = localStorage.getItem('messageHistory');
+      return savedMessages ? JSON.parse(savedMessages) : [];
+    } catch (e) {
+      console.error('Failed to load message history:', e);
+      return [];
+    }
   });
   
   const [queuedMessages, setQueuedMessages] = useState<string[]>([]);
   const [consumerActive, setConsumerActive] = useState(true);
   const [processingDelay, setProcessingDelay] = useState(2000);
-  const [sentMessageHistory, setSentMessageHistory] = useState<string[]>([]);
+  const [sentMessageHistory, setSentMessageHistory] = useState<string[]>(() => {
+    try {
+      const savedHistory = localStorage.getItem('sentMessageHistory');
+      return savedHistory ? JSON.parse(savedHistory) : [];
+    } catch (e) {
+      console.error('Failed to load sent message history:', e);
+      return [];
+    }
+  });
   
+  // Save messages to localStorage whenever they change
   useEffect(() => {
     const recentMessages = messages.slice(0, MAX_MESSAGE_HISTORY);
     localStorage.setItem('messageHistory', JSON.stringify(recentMessages));
   }, [messages]);
+  
+  // Save sent message history to localStorage
+  useEffect(() => {
+    localStorage.setItem('sentMessageHistory', JSON.stringify(sentMessageHistory.slice(0, 10)));
+  }, [sentMessageHistory]);
 
+  // Process queued messages when consumer is active
   useEffect(() => {
     if (!consumerActive || queuedMessages.length === 0) return;
 
@@ -39,7 +62,7 @@ const Index = () => {
       const newMessage: Message = {
         id: uuidv4(),
         content: nextMessage,
-        timestamp: new Date().toLocaleTimeString(),
+        timestamp: new Date().toISOString(),
         type: 'consumer',
         status: 'consumed'
       };
@@ -52,11 +75,12 @@ const Index = () => {
     return () => clearTimeout(timer);
   }, [queuedMessages, consumerActive, processingDelay]);
 
+  // Handle sending a message from the producer
   const handleSendMessage = (content: string) => {
     const newMessage: Message = {
       id: uuidv4(),
       content,
-      timestamp: new Date().toLocaleTimeString(),
+      timestamp: new Date().toISOString(),
       type: 'producer',
       status: 'delivered'
     };
@@ -64,6 +88,7 @@ const Index = () => {
     setMessages(prev => [newMessage, ...prev]);
     setQueuedMessages(prev => [...prev, content]);
     
+    // Update sent message history without duplicates
     setSentMessageHistory(prev => {
       if (!prev.includes(content)) {
         return [content, ...prev].slice(0, 10);
@@ -72,6 +97,7 @@ const Index = () => {
     });
   };
   
+  // Clear message history
   const handleClearMessages = useCallback((type?: 'producer' | 'consumer') => {
     if (!type) {
       setMessages([]);
@@ -80,9 +106,13 @@ const Index = () => {
     }
     
     setMessages(prev => prev.filter(message => message.type !== type));
+    if (type === 'producer') {
+      setSentMessageHistory([]);
+    }
     toast.info(`${type === 'producer' ? 'Sent' : 'Received'} message history cleared`);
   }, []);
 
+  // Process all queued messages at once
   const handleBatchProcess = useCallback(() => {
     if (queuedMessages.length === 0) return;
     
@@ -91,7 +121,7 @@ const Index = () => {
     const newMessages = queuedMessages.map(content => ({
       id: uuidv4(),
       content,
-      timestamp: new Date().toLocaleTimeString(),
+      timestamp: new Date().toISOString(),
       type: 'consumer' as const,
       status: 'consumed' as const
     }));

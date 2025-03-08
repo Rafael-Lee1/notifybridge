@@ -1,8 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MessageCard from './MessageCard';
-import { MessageSquare, Filter, Search } from 'lucide-react';
+import { MessageSquare, Filter, Search, Calendar, SlidersHorizontal, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
@@ -13,6 +13,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select';
+import { format } from 'date-fns';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Badge } from './ui/badge';
 
 export interface Message {
   id: string;
@@ -38,6 +46,26 @@ const MessageList: React.FC<MessageListProps> = ({
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
+  const [contentTypeFilter, setContentTypeFilter] = useState<string>('all');
+  
+  // Reset filters function
+  const resetFilters = () => {
+    setSearchTerm('');
+    setStatusFilter('all');
+    setDateFilter(undefined);
+    setContentTypeFilter('all');
+  };
+  
+  // Determine if a message is JSON
+  const isJsonMessage = (content: string): boolean => {
+    try {
+      JSON.parse(content);
+      return true;
+    } catch {
+      return false;
+    }
+  };
   
   const filteredMessages = messages
     .filter(message => message.type === type)
@@ -46,7 +74,29 @@ const MessageList: React.FC<MessageListProps> = ({
     )
     .filter(message => 
       statusFilter !== 'all' ? message.status === statusFilter : true
-    );
+    )
+    .filter(message => {
+      if (!dateFilter) return true;
+      
+      const messageDate = new Date(message.timestamp);
+      const filterDate = new Date(dateFilter);
+      
+      return messageDate.toDateString() === filterDate.toDateString();
+    })
+    .filter(message => {
+      if (contentTypeFilter === 'all') return true;
+      return contentTypeFilter === 'json' 
+        ? isJsonMessage(message.content) 
+        : !isJsonMessage(message.content);
+    });
+  
+  // Calculate active filter count
+  const activeFilterCount = [
+    searchTerm !== '',
+    statusFilter !== 'all',
+    dateFilter !== undefined,
+    contentTypeFilter !== 'all'
+  ].filter(Boolean).length;
   
   return (
     <motion.div
@@ -83,6 +133,15 @@ const MessageList: React.FC<MessageListProps> = ({
             onClick={() => setShowFilters(!showFilters)}
             className={cn(showFilters && "bg-muted")}
           >
+            <Badge 
+              variant="secondary" 
+              className={cn(
+                "absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center", 
+                activeFilterCount === 0 && "hidden"
+              )}
+            >
+              {activeFilterCount}
+            </Badge>
             <Filter className="w-4 h-4" />
           </Button>
         </div>
@@ -104,31 +163,100 @@ const MessageList: React.FC<MessageListProps> = ({
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="h-8"
               />
+              {searchTerm && (
+                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setSearchTerm('')}>
+                  <X className="h-3 w-3" />
+                </Button>
+              )}
             </div>
-            <div className="flex items-center gap-2 justify-between">
+            
+            <div className="grid grid-cols-2 gap-2">
               <div className="flex items-center gap-2">
                 <span className="text-sm">Status:</span>
                 <Select 
                   value={statusFilter} 
                   onValueChange={setStatusFilter}
                 >
-                  <SelectTrigger className="w-32 h-8">
+                  <SelectTrigger className="w-full h-8">
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="all">All Statuses</SelectItem>
                     <SelectItem value="pending">Pending</SelectItem>
                     <SelectItem value="delivered">Delivered</SelectItem>
                     <SelectItem value="consumed">Consumed</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+              
+              <div className="flex items-center gap-2">
+                <span className="text-sm">Type:</span>
+                <Select 
+                  value={contentTypeFilter} 
+                  onValueChange={setContentTypeFilter}
+                >
+                  <SelectTrigger className="w-full h-8">
+                    <SelectValue placeholder="Content Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Types</SelectItem>
+                    <SelectItem value="json">JSON</SelectItem>
+                    <SelectItem value="text">Plain Text</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <span className="text-sm">Date:</span>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={cn(
+                      "h-8 justify-start text-left font-normal",
+                      !dateFilter && "text-muted-foreground"
+                    )}
+                  >
+                    <Calendar className="mr-2 h-4 w-4" />
+                    {dateFilter ? format(dateFilter, "PPP") : "Select date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarComponent
+                    mode="single"
+                    selected={dateFilter}
+                    onSelect={setDateFilter}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              
+              {dateFilter && (
+                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setDateFilter(undefined)}>
+                  <X className="h-3 w-3" />
+                </Button>
+              )}
+            </div>
+            
+            <div className="flex items-center justify-between mt-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-xs h-7 flex items-center gap-1"
+                onClick={resetFilters}
+              >
+                <SlidersHorizontal className="w-3 h-3" />
+                Reset Filters
+              </Button>
+              
               {onClearMessages && (
                 <Button 
                   variant="outline" 
                   size="sm" 
                   onClick={onClearMessages}
-                  className="text-xs h-8"
+                  className="text-xs h-7"
                 >
                   Clear History
                 </Button>
@@ -143,8 +271,13 @@ const MessageList: React.FC<MessageListProps> = ({
           <div className="text-center py-12 text-muted-foreground flex flex-col items-center gap-2">
             <MessageSquare className="w-10 h-10 text-muted-foreground/30" />
             <p>No messages {type === 'producer' ? 'sent' : 'received'} yet</p>
-            {searchTerm || statusFilter !== 'all' ? (
-              <p className="text-sm text-muted-foreground/70">Try adjusting your filters</p>
+            {activeFilterCount > 0 ? (
+              <p className="text-sm text-muted-foreground/70">
+                Try adjusting your filters or 
+                <Button variant="link" className="h-auto p-0 mx-1" onClick={resetFilters}>
+                  reset all filters
+                </Button>
+              </p>
             ) : null}
           </div>
         ) : (
