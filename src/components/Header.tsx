@@ -64,7 +64,7 @@ const Header: React.FC = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <a
-                  href="https://github.com/example/messaging-system"
+                  href="https://github.com/Rafael-Lee1/notifybridge.git"
                   target="_blank"
                   rel="noreferrer"
                 >
