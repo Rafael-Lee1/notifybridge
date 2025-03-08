@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { MessageSquare, Info, Github } from 'lucide-react';
+import { MessageSquare, Info, Github, Settings } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { 
   Tooltip,
@@ -28,11 +28,17 @@ const Header: React.FC = () => {
           </Link>
         </div>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-          <nav className="flex items-center">
+          <nav className="flex items-center space-x-2">
             <Link to="/broker-info">
               <Button variant="ghost" size="sm" className="h-8 gap-1">
                 <Info className="h-4 w-4" />
                 <span>Broker Info</span>
+              </Button>
+            </Link>
+            <Link to="/settings">
+              <Button variant="ghost" size="sm" className="h-8 gap-1">
+                <Settings className="h-4 w-4" />
+                <span>Settings</span>
               </Button>
             </Link>
           </nav>
