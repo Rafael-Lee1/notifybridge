@@ -8,6 +8,8 @@ import Index from "./pages/Index";
 import BrokerInfo from "./pages/BrokerInfo";
 import Settings from "./pages/Settings";
 import MessageArchive from "./pages/MessageArchive";
+import MonitoringDashboard from "./pages/MonitoringDashboard";
+import TopicsQueues from "./pages/TopicsQueues";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +25,8 @@ const App = () => (
           <Route path="/broker-info" element={<BrokerInfo />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/message-archive" element={<MessageArchive />} />
+          <Route path="/monitoring" element={<MonitoringDashboard />} />
+          <Route path="/topics-queues" element={<TopicsQueues />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

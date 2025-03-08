@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { MessageSquare, Info, Github, Settings, Archive } from 'lucide-react';
+import { MessageSquare, Info, Github, Settings, Archive, BarChart2, Folder } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { 
   Tooltip,
@@ -33,6 +33,18 @@ const Header: React.FC = () => {
               <Button variant="ghost" size="sm" className="h-8 gap-1">
                 <Info className="h-4 w-4" />
                 <span>Broker Info</span>
+              </Button>
+            </Link>
+            <Link to="/monitoring">
+              <Button variant="ghost" size="sm" className="h-8 gap-1">
+                <BarChart2 className="h-4 w-4" />
+                <span>Monitoring</span>
+              </Button>
+            </Link>
+            <Link to="/topics-queues">
+              <Button variant="ghost" size="sm" className="h-8 gap-1">
+                <Folder className="h-4 w-4" />
+                <span>Topics & Queues</span>
               </Button>
             </Link>
             <Link to="/message-archive">
