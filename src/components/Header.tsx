@@ -2,15 +2,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { MessageSquare, Info, Github, Settings, Archive, BarChart2, Folder } from 'lucide-react';
+import { MessageSquare, Info, Github, Settings, Archive, BarChart2, Folder, BookOpen } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { 
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import UserProfileMenu from './UserProfileMenu';
+import { useAuth } from '@/context/AuthContext';
 
 const Header: React.FC = () => {
+  const { isAuthenticated, user } = useAuth();
+  
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
@@ -28,39 +32,50 @@ const Header: React.FC = () => {
           </Link>
         </div>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-          <nav className="flex items-center space-x-2">
-            <Link to="/broker-info">
-              <Button variant="ghost" size="sm" className="h-8 gap-1">
-                <Info className="h-4 w-4" />
-                <span>Broker Info</span>
-              </Button>
-            </Link>
-            <Link to="/monitoring">
-              <Button variant="ghost" size="sm" className="h-8 gap-1">
-                <BarChart2 className="h-4 w-4" />
-                <span>Monitoring</span>
-              </Button>
-            </Link>
-            <Link to="/topics-queues">
-              <Button variant="ghost" size="sm" className="h-8 gap-1">
-                <Folder className="h-4 w-4" />
-                <span>Topics & Queues</span>
-              </Button>
-            </Link>
-            <Link to="/message-archive">
-              <Button variant="ghost" size="sm" className="h-8 gap-1">
-                <Archive className="h-4 w-4" />
-                <span>Archive</span>
-              </Button>
-            </Link>
-            <Link to="/settings">
-              <Button variant="ghost" size="sm" className="h-8 gap-1">
-                <Settings className="h-4 w-4" />
-                <span>Settings</span>
-              </Button>
-            </Link>
-          </nav>
+          {isAuthenticated && (
+            <nav className="flex items-center space-x-2">
+              <Link to="/broker-info">
+                <Button variant="ghost" size="sm" className="h-8 gap-1">
+                  <Info className="h-4 w-4" />
+                  <span>Broker Info</span>
+                </Button>
+              </Link>
+              <Link to="/monitoring">
+                <Button variant="ghost" size="sm" className="h-8 gap-1">
+                  <BarChart2 className="h-4 w-4" />
+                  <span>Monitoring</span>
+                </Button>
+              </Link>
+              <Link to="/topics-queues">
+                <Button variant="ghost" size="sm" className="h-8 gap-1">
+                  <Folder className="h-4 w-4" />
+                  <span>Topics & Queues</span>
+                </Button>
+              </Link>
+              <Link to="/message-archive">
+                <Button variant="ghost" size="sm" className="h-8 gap-1">
+                  <Archive className="h-4 w-4" />
+                  <span>Archive</span>
+                </Button>
+              </Link>
+              <Link to="/docs">
+                <Button variant="ghost" size="sm" className="h-8 gap-1">
+                  <BookOpen className="h-4 w-4" />
+                  <span>Documentation</span>
+                </Button>
+              </Link>
+              {user?.role === 'admin' && (
+                <Link to="/settings">
+                  <Button variant="ghost" size="sm" className="h-8 gap-1">
+                    <Settings className="h-4 w-4" />
+                    <span>Settings</span>
+                  </Button>
+                </Link>
+              )}
+            </nav>
+          )}
           <div className="flex items-center gap-2">
+            <UserProfileMenu />
             <Tooltip>
               <TooltipTrigger asChild>
                 <a

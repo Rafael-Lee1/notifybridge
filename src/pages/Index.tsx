@@ -8,9 +8,13 @@ import Header from '@/components/Header';
 import ProducerPanel from '@/components/ProducerPanel';
 import ConsumerPanel from '@/components/ConsumerPanel';
 import EnhancedMessageFlow from '@/components/EnhancedMessageFlow';
+import AdvancedMessageFlow from '@/components/AdvancedMessageFlow';
 import MessageList, { Message } from '@/components/MessageList';
 import ConfigPanel, { BrokerConfig } from '@/components/ConfigPanel';
 import MessagingMetrics from '@/components/MessagingMetrics';
+import { useAuth } from '@/context/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Maximum number of messages to store in history
 const MAX_MESSAGE_HISTORY = 100;
@@ -25,6 +29,8 @@ export const BrokerConfigContext = createContext<BrokerConfig>({
 });
 
 const Index = () => {
+  const { user } = useAuth();
+  
   // Load messages from localStorage on initial render
   const [messages, setMessages] = useState<Message[]>(() => {
     try {
@@ -51,6 +57,8 @@ const Index = () => {
   
   // Show/hide metrics panel
   const [showMetrics, setShowMetrics] = useState(true);
+  // Toggle between simple and advanced flow
+  const [flowVisualization, setFlowVisualization] = useState<'simple' | 'advanced'>('simple');
   
   // Load broker config from localStorage
   const [brokerConfig, setBrokerConfig] = useState<BrokerConfig>(() => {
@@ -187,6 +195,16 @@ const Index = () => {
   // Filter messages by type
   const producerMessages = messages.filter(msg => msg.type === 'producer');
   const consumerMessages = messages.filter(msg => msg.type === 'consumer');
+  
+  // Welcome message for first-time login
+  useEffect(() => {
+    if (user) {
+      toast.success(`Welcome to the Messaging System, ${user.username}!`, {
+        description: "You're now logged in and can access all features.",
+        duration: 5000,
+      });
+    }
+  }, [user]);
 
   return (
     <BrokerConfigContext.Provider value={brokerConfig}>
@@ -209,6 +227,11 @@ const Index = () => {
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
               A visual demonstration of producer/consumer communication using a message broker
             </p>
+            {user && (
+              <p className="text-sm text-primary mt-2">
+                Logged in as {user.username} ({user.role})
+              </p>
+            )}
           </motion.div>
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
@@ -219,11 +242,26 @@ const Index = () => {
               />
             </div>
             
-            <div className="lg:col-span-2 flex items-center justify-center">
-              <EnhancedMessageFlow 
-                isActive={queuedMessages.length > 0 || consumerActive} 
-                messageCount={queuedMessages.length}
-              />
+            <div className="lg:col-span-2 flex flex-col items-center justify-center">
+              <Tabs 
+                value={flowVisualization} 
+                onValueChange={(v) => setFlowVisualization(v as 'simple' | 'advanced')}
+                className="w-full"
+              >
+                <TabsList className="grid w-full grid-cols-2 mb-4">
+                  <TabsTrigger value="simple">Simple</TabsTrigger>
+                  <TabsTrigger value="advanced">Advanced</TabsTrigger>
+                </TabsList>
+                <TabsContent value="simple" className="w-full">
+                  <EnhancedMessageFlow 
+                    isActive={queuedMessages.length > 0 || consumerActive} 
+                    messageCount={queuedMessages.length}
+                  />
+                </TabsContent>
+                <TabsContent value="advanced" className="w-full">
+                  <AdvancedMessageFlow />
+                </TabsContent>
+              </Tabs>
             </div>
             
             <div className="lg:col-span-5">
