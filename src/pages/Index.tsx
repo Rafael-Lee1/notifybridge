@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, createContext } from 'react';
 import { motion } from 'framer-motion';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
@@ -9,10 +9,19 @@ import ProducerPanel from '@/components/ProducerPanel';
 import ConsumerPanel from '@/components/ConsumerPanel';
 import MessageFlow from '@/components/MessageFlow';
 import MessageList, { Message } from '@/components/MessageList';
-import ConfigPanel from '@/components/ConfigPanel';
+import ConfigPanel, { BrokerConfig } from '@/components/ConfigPanel';
 
 // Maximum number of messages to store in history
 const MAX_MESSAGE_HISTORY = 100;
+
+// Create context for broker configuration
+export const BrokerConfigContext = createContext<BrokerConfig>({
+  brokerType: 'rabbitmq',
+  persistence: 'memory',
+  exchangeType: 'direct',
+  compression: false,
+  retentionHours: 24
+});
 
 const Index = () => {
   // Load messages from localStorage on initial render
@@ -39,6 +48,29 @@ const Index = () => {
     }
   });
   
+  // Load broker config from localStorage
+  const [brokerConfig, setBrokerConfig] = useState<BrokerConfig>(() => {
+    try {
+      const savedConfig = localStorage.getItem('brokerConfig');
+      return savedConfig ? JSON.parse(savedConfig) : {
+        brokerType: 'rabbitmq',
+        persistence: 'memory',
+        exchangeType: 'direct',
+        compression: false,
+        retentionHours: 24
+      };
+    } catch (e) {
+      console.error('Failed to load broker config:', e);
+      return {
+        brokerType: 'rabbitmq',
+        persistence: 'memory',
+        exchangeType: 'direct',
+        compression: false,
+        retentionHours: 24
+      };
+    }
+  });
+  
   // Save messages to localStorage whenever they change
   useEffect(() => {
     const recentMessages = messages.slice(0, MAX_MESSAGE_HISTORY);
@@ -49,6 +81,23 @@ const Index = () => {
   useEffect(() => {
     localStorage.setItem('sentMessageHistory', JSON.stringify(sentMessageHistory.slice(0, 10)));
   }, [sentMessageHistory]);
+  
+  // Update broker config when changed
+  useEffect(() => {
+    const handleStorageChange = () => {
+      try {
+        const savedConfig = localStorage.getItem('brokerConfig');
+        if (savedConfig) {
+          setBrokerConfig(JSON.parse(savedConfig));
+        }
+      } catch (e) {
+        console.error('Failed to load updated broker config:', e);
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   // Process queued messages when consumer is active
   useEffect(() => {
@@ -132,94 +181,96 @@ const Index = () => {
   }, [queuedMessages]);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Header />
-      
-      <motion.main 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.3 }}
-        className="flex-1 container max-w-7xl mx-auto px-4 py-6"
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="mb-8 text-center"
+    <BrokerConfigContext.Provider value={brokerConfig}>
+      <div className="min-h-screen bg-background flex flex-col">
+        <Header />
+        
+        <motion.main 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="flex-1 container max-w-7xl mx-auto px-4 py-6"
         >
-          <h1 className="text-4xl font-semibold tracking-tight mb-2">Messaging System Showcase</h1>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            A visual demonstration of producer/consumer communication using a message broker
-          </p>
-        </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="mb-8 text-center"
+          >
+            <h1 className="text-4xl font-semibold tracking-tight mb-2">Messaging System Showcase</h1>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              A visual demonstration of producer/consumer communication using a message broker
+            </p>
+          </motion.div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+            <div className="lg:col-span-5">
+              <ProducerPanel 
+                onSendMessage={handleSendMessage} 
+                recentMessages={sentMessageHistory}
+              />
+            </div>
+            
+            <div className="lg:col-span-2 flex items-center justify-center">
+              <MessageFlow 
+                isActive={queuedMessages.length > 0 || consumerActive} 
+                messageCount={queuedMessages.length}
+              />
+            </div>
+            
+            <div className="lg:col-span-5">
+              <ConsumerPanel
+                isActive={consumerActive}
+                onToggleActive={setConsumerActive}
+                messageCount={queuedMessages.length}
+                processingDelay={processingDelay}
+                onProcessingDelayChange={setProcessingDelay}
+                onBatchProcess={handleBatchProcess}
+              />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="lg:col-span-5 h-80">
+              <MessageList 
+                messages={messages} 
+                type="producer" 
+                onClearMessages={() => handleClearMessages('producer')}
+              />
+            </div>
+            
+            <div className="lg:col-span-2">
+              <ConfigPanel />
+            </div>
+            
+            <div className="lg:col-span-5 h-80">
+              <MessageList 
+                messages={messages} 
+                type="consumer" 
+                onClearMessages={() => handleClearMessages('consumer')}
+              />
+            </div>
+          </div>
+        </motion.main>
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
-          <div className="lg:col-span-5">
-            <ProducerPanel 
-              onSendMessage={handleSendMessage} 
-              recentMessages={sentMessageHistory}
-            />
+        <motion.footer
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+          className="py-6 border-t"
+        >
+          <div className="container max-w-7xl mx-auto px-4 flex justify-between items-center">
+            <p className="text-sm text-muted-foreground">
+              Interactive Messaging System Showcase
+            </p>
+            <div className="flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${consumerActive ? "bg-green-500" : "bg-amber-500"}`}></div>
+              <span className="text-sm">{consumerActive ? "All Systems Operational" : "Consumer Inactive"}</span>
+            </div>
           </div>
-          
-          <div className="lg:col-span-2 flex items-center justify-center">
-            <MessageFlow 
-              isActive={queuedMessages.length > 0 || consumerActive} 
-              messageCount={queuedMessages.length}
-            />
-          </div>
-          
-          <div className="lg:col-span-5">
-            <ConsumerPanel
-              isActive={consumerActive}
-              onToggleActive={setConsumerActive}
-              messageCount={queuedMessages.length}
-              processingDelay={processingDelay}
-              onProcessingDelayChange={setProcessingDelay}
-              onBatchProcess={handleBatchProcess}
-            />
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-5 h-80">
-            <MessageList 
-              messages={messages} 
-              type="producer" 
-              onClearMessages={() => handleClearMessages('producer')}
-            />
-          </div>
-          
-          <div className="lg:col-span-2">
-            <ConfigPanel />
-          </div>
-          
-          <div className="lg:col-span-5 h-80">
-            <MessageList 
-              messages={messages} 
-              type="consumer" 
-              onClearMessages={() => handleClearMessages('consumer')}
-            />
-          </div>
-        </div>
-      </motion.main>
-      
-      <motion.footer
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.6 }}
-        className="py-6 border-t"
-      >
-        <div className="container max-w-7xl mx-auto px-4 flex justify-between items-center">
-          <p className="text-sm text-muted-foreground">
-            Interactive Messaging System Showcase
-          </p>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-green-500"></div>
-            <span className="text-sm">All Systems Operational</span>
-          </div>
-        </div>
-      </motion.footer>
-    </div>
+        </motion.footer>
+      </div>
+    </BrokerConfigContext.Provider>
   );
 };
 
