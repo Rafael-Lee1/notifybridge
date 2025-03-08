@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from "@/components/ui/button";
@@ -28,7 +27,7 @@ interface ConfigPanelProps {
 }
 
 export interface BrokerConfig {
-  brokerType: 'rabbitmq' | 'kafka';
+  brokerType: 'rabbitmq' | 'kafka' | 'activemq';
   persistence: 'memory' | 'disk';
   exchangeType: 'direct' | 'topic' | 'fanout';
   compression: boolean;
@@ -36,7 +35,6 @@ export interface BrokerConfig {
 }
 
 const ConfigPanel: React.FC<ConfigPanelProps> = ({ className }) => {
-  // Load config from localStorage
   const [config, setConfig] = useState<BrokerConfig>(() => {
     try {
       const savedConfig = localStorage.getItem('brokerConfig');
@@ -70,12 +68,10 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ className }) => {
   
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // Save config to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('brokerConfig', JSON.stringify(config));
   }, [config]);
   
-  // Update system stats periodically
   useEffect(() => {
     const interval = setInterval(() => {
       setSystemStats(prev => ({
@@ -98,7 +94,6 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ className }) => {
   const handleApplyConfig = () => {
     setIsUpdating(true);
     
-    // Simulating configuration update
     setTimeout(() => {
       setIsUpdating(false);
       toast.success("Configuration applied successfully");
@@ -108,7 +103,6 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ className }) => {
   const handleRefreshStats = () => {
     setIsUpdating(true);
     
-    // Simulating stats refresh
     setTimeout(() => {
       setSystemStats({
         connections: Math.floor(Math.random() * 3) + 1,
@@ -127,7 +121,6 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ className }) => {
     if (confirm("Are you sure you want to purge all queues? This will remove all pending messages.")) {
       setIsUpdating(true);
       
-      // Simulating queue purge
       setTimeout(() => {
         setIsUpdating(false);
         toast.success("All queues purged successfully");
@@ -167,7 +160,7 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ className }) => {
               </label>
               <Select 
                 value={config.brokerType} 
-                onValueChange={(value: 'rabbitmq' | 'kafka') => handleConfigChange('brokerType', value)}
+                onValueChange={(value: 'rabbitmq' | 'kafka' | 'activemq') => handleConfigChange('brokerType', value)}
               >
                 <SelectTrigger id="broker-type">
                   <SelectValue placeholder="Select broker type" />
@@ -179,12 +172,17 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({ className }) => {
                   <SelectItem value="kafka" className="flex items-center">
                     Kafka
                   </SelectItem>
+                  <SelectItem value="activemq" className="flex items-center">
+                    ActiveMQ
+                  </SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
                 {config.brokerType === 'rabbitmq' 
                   ? "AMQP-based message broker with advanced routing capabilities"
-                  : "Distributed streaming platform with high throughput"
+                  : config.brokerType === 'kafka'
+                  ? "Distributed streaming platform with high throughput"
+                  : "JMS-based message broker with cross-language support"
                 }
               </p>
             </div>
