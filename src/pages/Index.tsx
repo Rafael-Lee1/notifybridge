@@ -7,9 +7,10 @@ import { toast } from 'sonner';
 import Header from '@/components/Header';
 import ProducerPanel from '@/components/ProducerPanel';
 import ConsumerPanel from '@/components/ConsumerPanel';
-import MessageFlow from '@/components/MessageFlow';
+import EnhancedMessageFlow from '@/components/EnhancedMessageFlow';
 import MessageList, { Message } from '@/components/MessageList';
 import ConfigPanel, { BrokerConfig } from '@/components/ConfigPanel';
+import MessagingMetrics from '@/components/MessagingMetrics';
 
 // Maximum number of messages to store in history
 const MAX_MESSAGE_HISTORY = 100;
@@ -47,6 +48,9 @@ const Index = () => {
       return [];
     }
   });
+  
+  // Show/hide metrics panel
+  const [showMetrics, setShowMetrics] = useState(true);
   
   // Load broker config from localStorage
   const [brokerConfig, setBrokerConfig] = useState<BrokerConfig>(() => {
@@ -180,6 +184,10 @@ const Index = () => {
     toast.success(`Successfully processed ${newMessages.length} messages`);
   }, [queuedMessages]);
 
+  // Filter messages by type
+  const producerMessages = messages.filter(msg => msg.type === 'producer');
+  const consumerMessages = messages.filter(msg => msg.type === 'consumer');
+
   return (
     <BrokerConfigContext.Provider value={brokerConfig}>
       <div className="min-h-screen bg-background flex flex-col">
@@ -212,7 +220,7 @@ const Index = () => {
             </div>
             
             <div className="lg:col-span-2 flex items-center justify-center">
-              <MessageFlow 
+              <EnhancedMessageFlow 
                 isActive={queuedMessages.length > 0 || consumerActive} 
                 messageCount={queuedMessages.length}
               />
@@ -229,6 +237,21 @@ const Index = () => {
               />
             </div>
           </div>
+          
+          {showMetrics && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              transition={{ duration: 0.3 }}
+              className="mb-6"
+            >
+              <MessagingMetrics 
+                producerMessages={producerMessages}
+                consumerMessages={consumerMessages}
+                queuedMessages={queuedMessages}
+              />
+            </motion.div>
+          )}
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-5 h-80">
@@ -264,6 +287,13 @@ const Index = () => {
               Interactive Messaging System Showcase
             </p>
             <div className="flex items-center gap-2">
+              <button 
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setShowMetrics(!showMetrics)}
+              >
+                {showMetrics ? 'Hide' : 'Show'} Metrics
+              </button>
+              <div className="px-2 border-r h-4"></div>
               <div className={`w-2 h-2 rounded-full ${consumerActive ? "bg-green-500" : "bg-amber-500"}`}></div>
               <span className="text-sm">{consumerActive ? "All Systems Operational" : "Consumer Inactive"}</span>
             </div>
