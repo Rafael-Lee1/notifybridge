@@ -24,10 +24,20 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
+// Define types for our documentation data
+interface DocItem {
+  title: string;
+  content: string;
+}
+
+interface DocCategories {
+  [key: string]: DocItem[];
+}
+
 const Documentation: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   
-  const documentation = {
+  const documentation: DocCategories = {
     'getting-started': [
       {
         title: 'Introduction',
@@ -199,7 +209,7 @@ const Documentation: React.FC = () => {
   const filterDocumentation = () => {
     if (!searchQuery.trim()) return documentation;
     
-    const filtered: any = {};
+    const filtered: DocCategories = {};
     
     Object.entries(documentation).forEach(([category, items]) => {
       const matchingItems = items.filter(item => 
