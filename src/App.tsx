@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import BrokerInfo from "./pages/BrokerInfo";
 import Settings from "./pages/Settings";
+import MessageArchive from "./pages/MessageArchive";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,6 +22,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/broker-info" element={<BrokerInfo />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/message-archive" element={<MessageArchive />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
