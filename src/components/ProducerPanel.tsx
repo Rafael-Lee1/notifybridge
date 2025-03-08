@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
@@ -55,20 +54,20 @@ interface ProducerPanelProps {
   recentMessages?: string[];
 }
 
-// Default message templates
-const DEFAULT_MESSAGE_TEMPLATES = [
-  { id: 'template1', name: 'Order Created', content: '{"event":"order_created","orderId":"ORD-123","items":3,"total":59.99}' },
-  { id: 'template2', name: 'Payment Processed', content: '{"event":"payment_processed","orderId":"ORD-123","amount":59.99,"status":"success"}' },
-  { id: 'template3', name: 'Shipment Update', content: '{"event":"shipment_update","orderId":"ORD-123","status":"shipped","eta":"2023-09-15"}' },
-  { id: 'template4', name: 'User Registered', content: '{"event":"user_registered","userId":"USR-456","email":"user@example.com"}' },
-];
-
 interface MessageTemplate {
   id: string;
   name: string;
   content: string;
   isCustom?: boolean;
 }
+
+// Default message templates
+const DEFAULT_MESSAGE_TEMPLATES: MessageTemplate[] = [
+  { id: 'template1', name: 'Order Created', content: '{"event":"order_created","orderId":"ORD-123","items":3,"total":59.99}', isCustom: false },
+  { id: 'template2', name: 'Payment Processed', content: '{"event":"payment_processed","orderId":"ORD-123","amount":59.99,"status":"success"}', isCustom: false },
+  { id: 'template3', name: 'Shipment Update', content: '{"event":"shipment_update","orderId":"ORD-123","status":"shipped","eta":"2023-09-15"}', isCustom: false },
+  { id: 'template4', name: 'User Registered', content: '{"event":"user_registered","userId":"USR-456","email":"user@example.com"}', isCustom: false },
+];
 
 const ProducerPanel: React.FC<ProducerPanelProps> = ({ 
   onSendMessage, 
