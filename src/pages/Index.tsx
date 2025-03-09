@@ -5,11 +5,16 @@ import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
 
 import Header from '@/components/Header';
-import ChatInterface from '@/components/ChatInterface';
-import { Message } from '@/components/MessageList';
+import ProducerPanel from '@/components/ProducerPanel';
+import ConsumerPanel from '@/components/ConsumerPanel';
+import EnhancedMessageFlow from '@/components/EnhancedMessageFlow';
+import AdvancedMessageFlow from '@/components/AdvancedMessageFlow';
+import MessageList, { Message } from '@/components/MessageList';
 import ConfigPanel, { BrokerConfig } from '@/components/ConfigPanel';
 import MessagingMetrics from '@/components/MessagingMetrics';
 import { useAuth } from '@/context/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Maximum number of messages to store in history
 const MAX_MESSAGE_HISTORY = 100;
@@ -51,7 +56,9 @@ const Index = () => {
   });
   
   // Show/hide metrics panel
-  const [showMetrics, setShowMetrics] = useState(false);
+  const [showMetrics, setShowMetrics] = useState(true);
+  // Toggle between simple and advanced flow
+  const [flowVisualization, setFlowVisualization] = useState<'simple' | 'advanced'>('simple');
   
   // Load broker config from localStorage
   const [brokerConfig, setBrokerConfig] = useState<BrokerConfig>(() => {
@@ -87,6 +94,23 @@ const Index = () => {
     localStorage.setItem('sentMessageHistory', JSON.stringify(sentMessageHistory.slice(0, 10)));
   }, [sentMessageHistory]);
   
+  // Update broker config when changed
+  useEffect(() => {
+    const handleStorageChange = () => {
+      try {
+        const savedConfig = localStorage.getItem('brokerConfig');
+        if (savedConfig) {
+          setBrokerConfig(JSON.parse(savedConfig));
+        }
+      } catch (e) {
+        console.error('Failed to load updated broker config:', e);
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   // Process queued messages when consumer is active
   useEffect(() => {
     if (!consumerActive || queuedMessages.length === 0) return;
@@ -105,9 +129,7 @@ const Index = () => {
       };
       
       setMessages(prev => [newMessage, ...prev]);
-      toast.success("Message received", {
-        description: nextMessage.length > 30 ? nextMessage.substring(0, 30) + '...' : nextMessage,
-      });
+      toast.success("Message processed by consumer");
       
     }, processingDelay);
     
@@ -134,10 +156,6 @@ const Index = () => {
       }
       return prev;
     });
-    
-    toast.success("Message sent", {
-      description: content.length > 30 ? content.substring(0, 30) + '...' : content,
-    });
   };
   
   // Clear message history
@@ -155,9 +173,42 @@ const Index = () => {
     toast.info(`${type === 'producer' ? 'Sent' : 'Received'} message history cleared`);
   }, []);
 
+  // Process all queued messages at once
+  const handleBatchProcess = useCallback(() => {
+    if (queuedMessages.length === 0) return;
+    
+    toast.info(`Processing all ${queuedMessages.length} queued messages...`);
+    
+    const newMessages = queuedMessages.map(content => ({
+      id: uuidv4(),
+      content,
+      timestamp: new Date().toISOString(),
+      type: 'consumer' as const,
+      status: 'consumed' as const
+    }));
+    
+    setMessages(prev => [...newMessages, ...prev]);
+    setQueuedMessages([]);
+    toast.success(`Successfully processed ${newMessages.length} messages`);
+  }, [queuedMessages]);
+
+  // Filter messages by type
+  const producerMessages = messages.filter(msg => msg.type === 'producer');
+  const consumerMessages = messages.filter(msg => msg.type === 'consumer');
+  
+  // Welcome message for first-time login
+  useEffect(() => {
+    if (user) {
+      toast.success(`Welcome to the Messaging System, ${user.username}!`, {
+        description: "You're now logged in and can access all features.",
+        duration: 5000,
+      });
+    }
+  }, [user]);
+
   return (
     <BrokerConfigContext.Provider value={brokerConfig}>
-      <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="min-h-screen bg-background flex flex-col">
         <Header />
         
         <motion.main 
@@ -166,11 +217,63 @@ const Index = () => {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="flex-1 container max-w-7xl mx-auto px-4 py-6"
         >
-          <div className="mb-6">
-            <ChatInterface 
-              messages={messages}
-              onSendMessage={handleSendMessage}
-            />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="mb-8 text-center"
+          >
+            <h1 className="text-4xl font-semibold tracking-tight mb-2">Messaging System Showcase</h1>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              A visual demonstration of producer/consumer communication using a message broker
+            </p>
+            {user && (
+              <p className="text-sm text-primary mt-2">
+                Logged in as {user.username} ({user.role})
+              </p>
+            )}
+          </motion.div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+            <div className="lg:col-span-5">
+              <ProducerPanel 
+                onSendMessage={handleSendMessage} 
+                recentMessages={sentMessageHistory}
+              />
+            </div>
+            
+            <div className="lg:col-span-2 flex flex-col items-center justify-center">
+              <Tabs 
+                value={flowVisualization} 
+                onValueChange={(v) => setFlowVisualization(v as 'simple' | 'advanced')}
+                className="w-full"
+              >
+                <TabsList className="grid w-full grid-cols-2 mb-4">
+                  <TabsTrigger value="simple">Simple</TabsTrigger>
+                  <TabsTrigger value="advanced">Advanced</TabsTrigger>
+                </TabsList>
+                <TabsContent value="simple" className="w-full">
+                  <EnhancedMessageFlow 
+                    isActive={queuedMessages.length > 0 || consumerActive} 
+                    messageCount={queuedMessages.length}
+                  />
+                </TabsContent>
+                <TabsContent value="advanced" className="w-full">
+                  <AdvancedMessageFlow />
+                </TabsContent>
+              </Tabs>
+            </div>
+            
+            <div className="lg:col-span-5">
+              <ConsumerPanel
+                isActive={consumerActive}
+                onToggleActive={setConsumerActive}
+                messageCount={queuedMessages.length}
+                processingDelay={processingDelay}
+                onProcessingDelayChange={setProcessingDelay}
+                onBatchProcess={handleBatchProcess}
+              />
+            </div>
           </div>
           
           {showMetrics && (
@@ -181,36 +284,52 @@ const Index = () => {
               className="mb-6"
             >
               <MessagingMetrics 
-                producerMessages={messages.filter(msg => msg.type === 'producer')}
-                consumerMessages={messages.filter(msg => msg.type === 'consumer')}
+                producerMessages={producerMessages}
+                consumerMessages={consumerMessages}
                 queuedMessages={queuedMessages}
               />
-              
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <ConfigPanel />
-                </div>
-              </div>
             </motion.div>
           )}
+          
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="lg:col-span-5 h-80">
+              <MessageList 
+                messages={messages} 
+                type="producer" 
+                onClearMessages={() => handleClearMessages('producer')}
+              />
+            </div>
+            
+            <div className="lg:col-span-2">
+              <ConfigPanel />
+            </div>
+            
+            <div className="lg:col-span-5 h-80">
+              <MessageList 
+                messages={messages} 
+                type="consumer" 
+                onClearMessages={() => handleClearMessages('consumer')}
+              />
+            </div>
+          </div>
         </motion.main>
         
         <motion.footer
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.6 }}
-          className="py-4 border-t bg-white"
+          className="py-6 border-t"
         >
           <div className="container max-w-7xl mx-auto px-4 flex justify-between items-center">
             <p className="text-sm text-muted-foreground">
               Interactive Messaging System Showcase
             </p>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
               <button 
-                className="text-sm text-blue-500 hover:text-blue-700 transition-colors"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 onClick={() => setShowMetrics(!showMetrics)}
               >
-                {showMetrics ? 'Hide' : 'Show'} Message Analytics
+                {showMetrics ? 'Hide' : 'Show'} Metrics
               </button>
               <div className="px-2 border-r h-4"></div>
               <div className={`w-2 h-2 rounded-full ${consumerActive ? "bg-green-500" : "bg-amber-500"}`}></div>
