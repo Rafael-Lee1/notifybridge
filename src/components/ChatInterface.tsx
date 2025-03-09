@@ -13,11 +13,23 @@ interface ChatInterfaceProps {
   onSendMessage: (content: string) => void;
 }
 
+// Define Contact type to match ContactList component
+interface Contact {
+  id: string;
+  name: string;
+  lastSeen: string;
+  avatar?: string;
+  unread: number;
+  isVerified?: boolean;
+  lastMessage?: string;
+  time?: string;
+}
+
 const ChatInterface: React.FC<ChatInterfaceProps> = ({ 
   messages,
   onSendMessage
 }) => {
-  const [activeContact, setActiveContact] = useState({
+  const [activeContact, setActiveContact] = useState<Contact>({
     id: 'abu-abdullah',
     name: 'Abu Abdullah Negraha',
     lastSeen: 'online',
@@ -80,7 +92,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         <div className={`${showMobileSidebar ? 'block' : 'hidden'} lg:block w-full lg:w-72 border-r bg-white`}>
           <ContactList 
             activeContactId={activeContact.id}
-            onSelectContact={setActiveContact}
+            onSelectContact={(contact) => setActiveContact(contact)}
           />
         </div>
 

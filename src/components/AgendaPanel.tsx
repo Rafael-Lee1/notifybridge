@@ -43,7 +43,7 @@ const AgendaPanel: React.FC = () => {
   ];
   
   // Calculate the month name and year for the current date
-  const currentMonth = date ? new Date(date).toLocaleString('default', { month: 'MMMM', year: 'numeric' }) : '';
+  const currentMonth = date ? new Date(date).toLocaleString('default', { month: 'long', year: 'numeric' }) : '';
   
   return (
     <div className="h-full flex flex-col">
