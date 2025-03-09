@@ -19,6 +19,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Unauthorized from "./pages/Unauthorized";
 import Documentation from "./pages/Documentation";
+import Profile from "./pages/Profile";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/monitoring" element={<ProtectedRoute element={<MonitoringDashboard />} requiredRoles={['admin', 'user']} />} />
             <Route path="/topics-queues" element={<ProtectedRoute element={<TopicsQueues />} requiredRoles={['admin', 'user']} />} />
             <Route path="/docs" element={<ProtectedRoute element={<Documentation />} />} />
+            <Route path="/profile" element={<ProtectedRoute element={<Profile />} />} />
             
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />

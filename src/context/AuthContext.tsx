@@ -17,6 +17,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   register: (email: string, username: string, password: string) => Promise<void>;
+  updateUserProfile: (updatedUser: Partial<User>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -26,6 +27,7 @@ const AuthContext = createContext<AuthContextType>({
   login: async () => {},
   logout: () => {},
   register: async () => {},
+  updateUserProfile: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -128,8 +130,52 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(false);
   };
 
+  const updateUserProfile = async (updatedUser: Partial<User>) => {
+    setIsLoading(true);
+    
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    if (user) {
+      // Create updated user object
+      const newUserData = { ...user, ...updatedUser };
+      
+      // Update state and localStorage
+      setUser(newUserData);
+      localStorage.setItem('user', JSON.stringify(newUserData));
+      
+      // Generate new avatar if username changed and no custom avatar provided
+      if (updatedUser.username && !updatedUser.avatar && !user.avatar?.startsWith('data:')) {
+        const newAvatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${updatedUser.username}`;
+        setUser(prev => {
+          if (prev) {
+            const updatedUserWithAvatar = { ...prev, avatar: newAvatarUrl };
+            localStorage.setItem('user', JSON.stringify(updatedUserWithAvatar));
+            return updatedUserWithAvatar;
+          }
+          return prev;
+        });
+      }
+      
+      toast.success('Profile updated successfully!');
+    } else {
+      toast.error('No user found to update');
+      throw new Error('No user found');
+    }
+    
+    setIsLoading(false);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout, register }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      isAuthenticated: !!user, 
+      isLoading, 
+      login, 
+      logout, 
+      register,
+      updateUserProfile
+    }}>
       {children}
     </AuthContext.Provider>
   );
