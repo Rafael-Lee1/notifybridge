@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MessageCard from './MessageCard';
@@ -35,13 +34,20 @@ interface MessageListProps {
   type: 'producer' | 'consumer';
   className?: string;
   onClearMessages?: () => void;
+  compact?: boolean;
+  sender?: {
+    name: string;
+    avatar?: string;
+  };
 }
 
 const MessageList: React.FC<MessageListProps> = ({ 
   messages, 
   type, 
   className,
-  onClearMessages 
+  onClearMessages,
+  compact = false,
+  sender
 }) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -49,7 +55,6 @@ const MessageList: React.FC<MessageListProps> = ({
   const [dateFilter, setDateFilter] = useState<Date | undefined>(undefined);
   const [contentTypeFilter, setContentTypeFilter] = useState<string>('all');
   
-  // Reset filters function
   const resetFilters = () => {
     setSearchTerm('');
     setStatusFilter('all');
@@ -57,7 +62,6 @@ const MessageList: React.FC<MessageListProps> = ({
     setContentTypeFilter('all');
   };
   
-  // Determine if a message is JSON
   const isJsonMessage = (content: string): boolean => {
     try {
       JSON.parse(content);
@@ -90,13 +94,37 @@ const MessageList: React.FC<MessageListProps> = ({
         : !isJsonMessage(message.content);
     });
   
-  // Calculate active filter count
   const activeFilterCount = [
     searchTerm !== '',
     statusFilter !== 'all',
     dateFilter !== undefined,
     contentTypeFilter !== 'all'
   ].filter(Boolean).length;
+  
+  if (compact) {
+    return (
+      <div className={cn("overflow-y-auto", className)}>
+        {filteredMessages.length === 0 ? (
+          <div className="text-center py-4 text-muted-foreground">
+            <p>No messages {type === 'producer' ? 'sent' : 'received'} yet</p>
+          </div>
+        ) : (
+          filteredMessages.map(message => (
+            <MessageCard
+              key={message.id}
+              id={message.id}
+              content={message.content}
+              timestamp={message.timestamp}
+              type={message.type}
+              status={message.status}
+              sender={sender}
+              className="mx-4"
+            />
+          ))
+        )}
+      </div>
+    );
+  }
   
   return (
     <motion.div
@@ -290,6 +318,7 @@ const MessageList: React.FC<MessageListProps> = ({
                 timestamp={message.timestamp}
                 type={message.type}
                 status={message.status}
+                sender={sender}
               />
             ))}
           </AnimatePresence>
