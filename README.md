@@ -8,8 +8,6 @@
 
 Este projeto é uma aplicação de simulação interativa de sistemas de mensagens, desenvolvida para demonstrar e visualizar operações de message brokers. Ele fornece uma interface completa para simular padrões de produtores/consumidores em sistemas de filas de mensagens, servindo como uma ferramenta educativa para entender os conceitos de comunicação assíncrona em sistemas distribuídos.
 
-**Você pode acessar o projeto clicando <a href="https://preview--notifybridge.lovable.app/">aqui</a>.</p>
-
 ## Core Features
 
 ### Message Production and Consumption
