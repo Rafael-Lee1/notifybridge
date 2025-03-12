@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, createContext } from 'react';
 import { motion } from 'framer-motion';
 import { v4 as uuidv4 } from 'uuid';
@@ -215,7 +214,7 @@ const Index = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="flex-1 container max-w-7xl mx-auto px-4 py-6"
+          className="flex-1 container max-w-7xl mx-auto px-4 py-6 overflow-x-hidden"
         >
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -223,8 +222,8 @@ const Index = () => {
             transition={{ duration: 0.5, delay: 0.4 }}
             className="mb-8 text-center"
           >
-            <h1 className="text-4xl font-semibold tracking-tight mb-2">Messaging System Showcase</h1>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+            <h1 className="text-3xl md:text-4xl font-semibold tracking-tight mb-2">Messaging System Showcase</h1>
+            <p className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto px-2">
               A visual demonstration of producer/consumer communication using a message broker
             </p>
             {user && (
@@ -234,15 +233,15 @@ const Index = () => {
             )}
           </motion.div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
-            <div className="lg:col-span-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 md:gap-6 mb-6">
+            <div className="md:col-span-1 lg:col-span-5">
               <ProducerPanel 
                 onSendMessage={handleSendMessage} 
                 recentMessages={sentMessageHistory}
               />
             </div>
             
-            <div className="lg:col-span-2 flex flex-col items-center justify-center">
+            <div className="md:col-span-2 lg:col-span-2 flex flex-col items-center justify-center mt-4 md:mt-0">
               <Tabs 
                 value={flowVisualization} 
                 onValueChange={(v) => setFlowVisualization(v as 'simple' | 'advanced')}
@@ -264,7 +263,7 @@ const Index = () => {
               </Tabs>
             </div>
             
-            <div className="lg:col-span-5">
+            <div className="md:col-span-1 lg:col-span-5">
               <ConsumerPanel
                 isActive={consumerActive}
                 onToggleActive={setConsumerActive}
@@ -281,7 +280,7 @@ const Index = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               transition={{ duration: 0.3 }}
-              className="mb-6"
+              className="mb-6 overflow-x-auto"
             >
               <MessagingMetrics 
                 producerMessages={producerMessages}
@@ -291,8 +290,8 @@ const Index = () => {
             </motion.div>
           )}
           
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div className="lg:col-span-5 h-80">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 md:gap-6">
+            <div className="md:col-span-1 lg:col-span-5 h-80">
               <MessageList 
                 messages={messages} 
                 type="producer" 
@@ -300,11 +299,11 @@ const Index = () => {
               />
             </div>
             
-            <div className="lg:col-span-2">
+            <div className="md:col-span-2 lg:col-span-2 mt-4 md:mt-0">
               <ConfigPanel />
             </div>
             
-            <div className="lg:col-span-5 h-80">
+            <div className="md:col-span-1 lg:col-span-5 h-80">
               <MessageList 
                 messages={messages} 
                 type="consumer" 
@@ -318,9 +317,9 @@ const Index = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.6 }}
-          className="py-6 border-t"
+          className="py-4 md:py-6 border-t"
         >
-          <div className="container max-w-7xl mx-auto px-4 flex justify-between items-center">
+          <div className="container max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-2">
             <p className="text-sm text-muted-foreground">
               Interactive Messaging System Showcase
             </p>
@@ -331,7 +330,7 @@ const Index = () => {
               >
                 {showMetrics ? 'Hide' : 'Show'} Metrics
               </button>
-              <div className="px-2 border-r h-4"></div>
+              <div className="px-2 border-r h-4 hidden md:block"></div>
               <div className={`w-2 h-2 rounded-full ${consumerActive ? "bg-green-500" : "bg-amber-500"}`}></div>
               <span className="text-sm">{consumerActive ? "All Systems Operational" : "Consumer Inactive"}</span>
             </div>

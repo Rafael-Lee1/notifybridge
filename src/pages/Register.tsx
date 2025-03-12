@@ -47,7 +47,7 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 sm:p-6 md:p-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -56,8 +56,8 @@ const Register: React.FC = () => {
       >
         <Card className="border-none shadow-lg">
           <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-xl sm:text-2xl font-bold">Create an account</CardTitle>
+            <CardDescription className="text-sm sm:text-base">
               Enter your details to create a new account
             </CardDescription>
           </CardHeader>
@@ -66,7 +66,7 @@ const Register: React.FC = () => {
               <div className="space-y-2">
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <Mail className="h-5 w-5 text-muted-foreground" />
+                    <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
                   </div>
                   <Input
                     type="email"
@@ -82,7 +82,7 @@ const Register: React.FC = () => {
               <div className="space-y-2">
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <User className="h-5 w-5 text-muted-foreground" />
+                    <User className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
                   </div>
                   <Input
                     type="text"
@@ -98,7 +98,7 @@ const Register: React.FC = () => {
               <div className="space-y-2">
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <Lock className="h-5 w-5 text-muted-foreground" />
+                    <Lock className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
                   </div>
                   <Input
                     type="password"
@@ -114,7 +114,7 @@ const Register: React.FC = () => {
               <div className="space-y-2">
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <Lock className="h-5 w-5 text-muted-foreground" />
+                    <Lock className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
                   </div>
                   <Input
                     type="password"

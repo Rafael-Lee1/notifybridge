@@ -78,16 +78,16 @@ const Profile: React.FC = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container max-w-4xl py-8">
+      <main className="container max-w-4xl py-4 sm:py-6 md:py-8 px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
           <Card className="border-none shadow-md">
-            <CardHeader className="border-b bg-muted/40 pb-8">
-              <CardTitle className="text-2xl">Profile Settings</CardTitle>
-              <CardDescription>
+            <CardHeader className="border-b bg-muted/40 pb-6 sm:pb-8">
+              <CardTitle className="text-xl sm:text-2xl">Profile Settings</CardTitle>
+              <CardDescription className="text-sm sm:text-base">
                 Manage your profile information and preferences
               </CardDescription>
             </CardHeader>
@@ -96,14 +96,14 @@ const Profile: React.FC = () => {
               <div className="grid gap-6 md:grid-cols-[1fr_2fr]">
                 <div className="flex flex-col items-center space-y-4">
                   <div className="relative group">
-                    <Avatar className="h-32 w-32 cursor-pointer border-4 border-background shadow-md transition-all hover:border-primary/20">
+                    <Avatar className="h-24 w-24 sm:h-32 sm:w-32 cursor-pointer border-4 border-background shadow-md transition-all hover:border-primary/20">
                       <AvatarImage 
                         src={selectedImage || formData.avatar} 
                         alt={formData.username} 
                         onClick={isEditing ? handleImageClick : undefined}
                         className={isEditing ? "hover:opacity-80" : ""}
                       />
-                      <AvatarFallback className="text-4xl">
+                      <AvatarFallback className="text-3xl sm:text-4xl">
                         {getInitials(formData.username)}
                       </AvatarFallback>
                     </Avatar>
@@ -113,7 +113,7 @@ const Profile: React.FC = () => {
                         className="absolute bottom-0 right-0 rounded-full bg-primary p-2 text-white shadow-md hover:bg-primary/90"
                         onClick={handleImageClick}
                       >
-                        <Camera className="h-5 w-5" />
+                        <Camera className="h-4 w-4 sm:h-5 sm:w-5" />
                       </div>
                     )}
                     
@@ -127,7 +127,7 @@ const Profile: React.FC = () => {
                   </div>
                   
                   <div className="text-center">
-                    <h3 className="text-xl font-semibold">{formData.username}</h3>
+                    <h3 className="text-lg sm:text-xl font-semibold">{formData.username}</h3>
                     <p className="text-sm text-muted-foreground">{user?.role}</p>
                   </div>
                   
@@ -136,6 +136,7 @@ const Profile: React.FC = () => {
                       onClick={() => setIsEditing(true)}
                       className="mt-2"
                       variant="outline"
+                      size="sm"
                     >
                       <UserRound className="mr-2 h-4 w-4" />
                       Edit Profile
@@ -143,7 +144,7 @@ const Profile: React.FC = () => {
                   )}
                 </div>
                 
-                <div className="space-y-6">
+                <div className="space-y-4 sm:space-y-6">
                   <div className="space-y-2">
                     <Label htmlFor="username">Username</Label>
                     <Input
@@ -183,12 +184,12 @@ const Profile: React.FC = () => {
             </CardContent>
             
             {isEditing && (
-              <CardFooter className="border-t bg-muted/40 gap-2 justify-end pt-4">
-                <Button variant="outline" onClick={handleCancel}>
+              <CardFooter className="border-t bg-muted/40 gap-2 justify-end pt-4 flex-wrap">
+                <Button variant="outline" onClick={handleCancel} size="sm">
                   <X className="mr-2 h-4 w-4" />
                   Cancel
                 </Button>
-                <Button onClick={handleSave}>
+                <Button onClick={handleSave} size="sm">
                   <Save className="mr-2 h-4 w-4" />
                   Save Changes
                 </Button>

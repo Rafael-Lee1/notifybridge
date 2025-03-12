@@ -28,10 +28,10 @@ const UserProfileMenu: React.FC = () => {
   if (!isAuthenticated || !user) {
     return (
       <div className="flex items-center gap-2">
-        <Button variant="outline" size="sm" asChild>
+        <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm h-8">
           <Link to="/login">Login</Link>
         </Button>
-        <Button size="sm" asChild>
+        <Button size="sm" asChild className="text-xs sm:text-sm h-8">
           <Link to="/register">Sign Up</Link>
         </Button>
       </div>
@@ -61,7 +61,7 @@ const UserProfileMenu: React.FC = () => {
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-base font-medium">{user.username}</p>
+            <p className="text-sm sm:text-base font-medium">{user.username}</p>
             <p className="text-xs text-muted-foreground">{user.email}</p>
             <div className="flex items-center mt-1">
               <Badge variant={user.role === 'admin' ? 'default' : 'secondary'} className="text-xs">
@@ -73,28 +73,34 @@ const UserProfileMenu: React.FC = () => {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <Link to="/profile">
+            <Link to="/profile" className="flex items-center w-full cursor-pointer">
               <User className="mr-2 h-4 w-4" />
               <span>Profile</span>
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Bell className="mr-2 h-4 w-4" />
-            <span>Notifications</span>
+          <DropdownMenuItem asChild>
+            <div className="flex items-center w-full cursor-pointer">
+              <Bell className="mr-2 h-4 w-4" />
+              <span>Notifications</span>
+            </div>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
+          <DropdownMenuItem asChild>
+            <Link to="/settings" className="flex items-center w-full cursor-pointer">
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Settings</span>
+            </Link>
           </DropdownMenuItem>
           {user.role === 'admin' && (
-            <DropdownMenuItem>
-              <Shield className="mr-2 h-4 w-4" />
-              <span>Admin Panel</span>
+            <DropdownMenuItem asChild>
+              <div className="flex items-center w-full cursor-pointer">
+                <Shield className="mr-2 h-4 w-4" />
+                <span>Admin Panel</span>
+              </div>
             </DropdownMenuItem>
           )}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={logout}>
+        <DropdownMenuItem onClick={logout} className="flex items-center w-full cursor-pointer">
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
         </DropdownMenuItem>
