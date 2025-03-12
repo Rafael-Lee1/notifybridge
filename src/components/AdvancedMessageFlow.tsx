@@ -52,7 +52,7 @@ const AdvancedMessageFlow: React.FC<AdvancedMessageFlowProps> = ({
       const { width, height } = containerRef.current.getBoundingClientRect();
       setDimensions({ width, height });
       
-      // Create initial nodes
+      // Create initial nodes with better spacing based on available width/height
       const initialNodes: MessageNode[] = [
         {
           id: 'producer1',
@@ -63,7 +63,7 @@ const AdvancedMessageFlow: React.FC<AdvancedMessageFlowProps> = ({
           connections: ['broker1'],
           status: 'active',
           messageCount: 0,
-          icon: <HardDrive className="w-6 h-6 text-blue-500" />
+          icon: <HardDrive className="w-5 h-5 text-blue-500" />
         },
         {
           id: 'producer2',
@@ -74,7 +74,7 @@ const AdvancedMessageFlow: React.FC<AdvancedMessageFlowProps> = ({
           connections: ['broker1'],
           status: 'active',
           messageCount: 0,
-          icon: <HardDrive className="w-6 h-6 text-indigo-500" />
+          icon: <HardDrive className="w-5 h-5 text-indigo-500" />
         },
         {
           id: 'producer3',
@@ -85,7 +85,7 @@ const AdvancedMessageFlow: React.FC<AdvancedMessageFlowProps> = ({
           connections: ['broker1'],
           status: 'inactive',
           messageCount: 0,
-          icon: <HardDrive className="w-6 h-6 text-gray-500" />
+          icon: <HardDrive className="w-5 h-5 text-gray-500" />
         },
         {
           id: 'broker1',
@@ -96,7 +96,7 @@ const AdvancedMessageFlow: React.FC<AdvancedMessageFlowProps> = ({
           connections: ['topic1', 'topic2', 'database1'],
           status: 'active',
           messageCount: 0,
-          icon: <Server className="w-6 h-6 text-orange-500" />
+          icon: <Server className="w-5 h-5 text-orange-500" />
         },
         {
           id: 'topic1',
@@ -107,7 +107,7 @@ const AdvancedMessageFlow: React.FC<AdvancedMessageFlowProps> = ({
           connections: ['consumer1', 'consumer2'],
           status: 'active',
           messageCount: 0,
-          icon: <Layers className="w-6 h-6 text-purple-500" />
+          icon: <Layers className="w-5 h-5 text-purple-500" />
         },
         {
           id: 'topic2',
@@ -118,7 +118,7 @@ const AdvancedMessageFlow: React.FC<AdvancedMessageFlowProps> = ({
           connections: ['consumer3'],
           status: 'active',
           messageCount: 0,
-          icon: <Layers className="w-6 h-6 text-green-500" />
+          icon: <Layers className="w-5 h-5 text-green-500" />
         },
         {
           id: 'consumer1',
@@ -129,7 +129,7 @@ const AdvancedMessageFlow: React.FC<AdvancedMessageFlowProps> = ({
           connections: [],
           status: 'active',
           messageCount: 0,
-          icon: <Activity className="w-6 h-6 text-blue-500" />
+          icon: <Activity className="w-5 h-5 text-blue-500" />
         },
         {
           id: 'consumer2',
@@ -140,7 +140,7 @@ const AdvancedMessageFlow: React.FC<AdvancedMessageFlowProps> = ({
           connections: [],
           status: 'warning',
           messageCount: 0,
-          icon: <Activity className="w-6 h-6 text-yellow-500" />
+          icon: <Activity className="w-5 h-5 text-yellow-500" />
         },
         {
           id: 'consumer3',
@@ -151,7 +151,7 @@ const AdvancedMessageFlow: React.FC<AdvancedMessageFlowProps> = ({
           connections: [],
           status: 'active',
           messageCount: 0,
-          icon: <Activity className="w-6 h-6 text-green-500" />
+          icon: <Activity className="w-5 h-5 text-green-500" />
         },
         {
           id: 'database1',
@@ -162,7 +162,7 @@ const AdvancedMessageFlow: React.FC<AdvancedMessageFlowProps> = ({
           connections: [],
           status: 'active',
           messageCount: 0,
-          icon: <Database className="w-6 h-6 text-blue-400" />
+          icon: <Database className="w-5 h-5 text-blue-400" />
         }
       ];
       
@@ -184,29 +184,44 @@ const AdvancedMessageFlow: React.FC<AdvancedMessageFlowProps> = ({
     }
   }, []);
   
-  // Handle window resize
+  // Handle window resize more efficiently
   useEffect(() => {
     const handleResize = () => {
       if (containerRef.current) {
         const { width, height } = containerRef.current.getBoundingClientRect();
-        setDimensions({ width, height });
         
-        // Update node positions on resize
-        setNodes(prevNodes => prevNodes.map(node => {
-          const relativeX = node.x / dimensions.width;
-          const relativeY = node.y / dimensions.height;
-          return {
-            ...node,
-            x: relativeX * width,
-            y: relativeY * height
-          };
-        }));
+        // Only update if dimensions have significantly changed
+        if (Math.abs(width - dimensions.width) > 20 || Math.abs(height - dimensions.height) > 20) {
+          setDimensions({ width, height });
+          
+          // Update node positions proportionally
+          setNodes(prevNodes => prevNodes.map(node => {
+            const relativeX = node.x / dimensions.width;
+            const relativeY = node.y / dimensions.height;
+            return {
+              ...node,
+              x: relativeX * width,
+              y: relativeY * height
+            };
+          }));
+        }
       }
     };
     
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    const debouncedResize = debounce(handleResize, 250);
+    window.addEventListener('resize', debouncedResize);
+    
+    return () => window.removeEventListener('resize', debouncedResize);
   }, [dimensions]);
+  
+  // Simple debounce function to limit resize event handling
+  function debounce(func: Function, wait: number) {
+    let timeout: ReturnType<typeof setTimeout>;
+    return function(...args: any[]) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), wait);
+    };
+  }
   
   // Auto-generate messages
   useEffect(() => {
@@ -401,7 +416,7 @@ const AdvancedMessageFlow: React.FC<AdvancedMessageFlowProps> = ({
         })}
       </AnimatePresence>
       
-      {/* Nodes */}
+      {/* Nodes with adjusted sizing and positioning */}
       {nodes.map((node) => (
         <motion.div
           key={node.id}
@@ -410,27 +425,31 @@ const AdvancedMessageFlow: React.FC<AdvancedMessageFlowProps> = ({
             node.status === 'inactive' ? "opacity-60" : "opacity-100"
           )}
           style={{
-            left: node.x - 40,
-            top: node.y - 40,
+            left: node.x - 30, // Reduced from 40 to prevent edge overflows
+            top: node.y - 30,  // Reduced from 40 to prevent edge overflows
+            transform: 'translate(-50%, -50%)',
+            width: '60px',     // Fixed width to ensure consistent sizing
           }}
           whileHover={{ scale: 1.05 }}
         >
           <div className={cn(
-            "flex items-center justify-center w-16 h-16 rounded-lg border shadow-sm",
+            "flex items-center justify-center w-12 h-12 rounded-lg border shadow-sm", // Reduced from w-16 h-16
             node.status === 'active' ? "bg-background" : "bg-muted"
           )}>
-            {node.icon || <BarChart2 className="w-6 h-6 text-primary" />}
+            {node.icon || <BarChart2 className="w-5 h-5 text-primary" />}
             {node.messageCount && node.messageCount > 0 && (
               <div className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center">
                 {node.messageCount}
               </div>
             )}
           </div>
-          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-3 flex flex-col items-center">
-            <div className="text-xs font-medium whitespace-nowrap">{node.label}</div>
+          <div className="absolute top-12 left-1/2 transform -translate-x-1/2 mt-1 flex flex-col items-center w-full">
+            <div className="text-[0.65rem] font-medium text-center whitespace-nowrap max-w-24 overflow-hidden text-ellipsis">
+              {node.label}
+            </div>
             <div className="mt-1 flex items-center gap-1">
-              <div className={cn("h-2 w-2 rounded-full", getStatusColor(node.status))}></div>
-              <div className="text-[0.65rem] text-muted-foreground">{node.status}</div>
+              <div className={cn("h-1.5 w-1.5 rounded-full", getStatusColor(node.status))}></div>
+              <div className="text-[0.6rem] text-muted-foreground">{node.status}</div>
             </div>
           </div>
         </motion.div>

@@ -43,6 +43,11 @@
   color: #888;
 }
 
+/* Shadow for animated messages */
+.shadow-glow {
+  box-shadow: 0 0 8px 2px rgba(124, 58, 237, 0.5);
+}
+
 /* Responsive utilities */
 @media (max-width: 640px) {
   .hide-on-mobile {
@@ -75,4 +80,17 @@ body {
   max-width: 100vw;
   overflow-x: hidden;
   position: relative;
+}
+
+/* Fix text overflow in small containers */
+.text-ellipsis {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* Ensure SVG containers resize properly */
+svg {
+  max-width: 100%;
+  height: auto;
 }
