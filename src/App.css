@@ -94,3 +94,24 @@ svg {
   max-width: 100%;
   height: auto;
 }
+
+/* Advanced flow container styles */
+.advanced-flow-container {
+  width: 100%; 
+  overflow: hidden;
+  position: relative;
+}
+
+/* Prevent overflow in tabs components */
+.tabs-container {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Allow advanced panel to expand vertically */
+.advanced-panel {
+  height: auto;
+  min-height: 300px;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}

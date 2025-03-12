@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, createContext } from 'react';
 import { motion } from 'framer-motion';
 import { v4 as uuidv4 } from 'uuid';
@@ -242,25 +243,37 @@ const Index = () => {
             </div>
             
             <div className="md:col-span-2 lg:col-span-2 flex flex-col items-center justify-center mt-4 md:mt-0">
-              <Tabs 
-                value={flowVisualization} 
-                onValueChange={(v) => setFlowVisualization(v as 'simple' | 'advanced')}
-                className="w-full"
-              >
-                <TabsList className="grid w-full grid-cols-2 mb-4">
-                  <TabsTrigger value="simple">Simple</TabsTrigger>
-                  <TabsTrigger value="advanced">Advanced</TabsTrigger>
-                </TabsList>
-                <TabsContent value="simple" className="w-full">
-                  <EnhancedMessageFlow 
-                    isActive={queuedMessages.length > 0 || consumerActive} 
-                    messageCount={queuedMessages.length}
-                  />
-                </TabsContent>
-                <TabsContent value="advanced" className="w-full">
-                  <AdvancedMessageFlow />
-                </TabsContent>
-              </Tabs>
+              {flowVisualization === 'simple' && (
+                <Tabs 
+                  value={flowVisualization} 
+                  onValueChange={(v) => setFlowVisualization(v as 'simple' | 'advanced')}
+                  className="w-full"
+                >
+                  <TabsList className="grid w-full grid-cols-2 mb-4">
+                    <TabsTrigger value="simple">Simple</TabsTrigger>
+                    <TabsTrigger value="advanced">Advanced</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="simple" className="w-full">
+                    <EnhancedMessageFlow 
+                      isActive={queuedMessages.length > 0 || consumerActive} 
+                      messageCount={queuedMessages.length}
+                    />
+                  </TabsContent>
+                </Tabs>
+              )}
+              
+              {flowVisualization === 'simple' || (
+                <Tabs 
+                  value={flowVisualization} 
+                  onValueChange={(v) => setFlowVisualization(v as 'simple' | 'advanced')}
+                  className="w-full"
+                >
+                  <TabsList className="grid w-full grid-cols-2 mb-4">
+                    <TabsTrigger value="simple">Simple</TabsTrigger>
+                    <TabsTrigger value="advanced">Advanced</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              )}
             </div>
             
             <div className="md:col-span-1 lg:col-span-5">
@@ -274,6 +287,20 @@ const Index = () => {
               />
             </div>
           </div>
+          
+          {/* Advanced mode visualization rendered below when selected */}
+          {flowVisualization === 'advanced' && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="mb-6 p-4 border rounded-lg bg-background/50"
+            >
+              <h3 className="text-lg font-medium mb-2">Advanced Message Flow Visualization</h3>
+              <AdvancedMessageFlow />
+            </motion.div>
+          )}
           
           {showMetrics && (
             <motion.div
