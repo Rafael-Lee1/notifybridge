@@ -1,8 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { MessageSquare, Info, Github, Settings, Archive, BarChart2, Folder, BookOpen } from 'lucide-react';
+import { MessageSquare, Info, Github, Settings, Archive, BarChart2, Folder, BookOpen, Menu, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { 
   Tooltip,
@@ -11,9 +11,24 @@ import {
 } from "@/components/ui/tooltip";
 import UserProfileMenu from './UserProfileMenu';
 import { useAuth } from '@/context/AuthContext';
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Header: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  const navLinks = [
+    { to: "/broker-info", icon: <Info className="h-4 w-4" />, label: "Broker Info" },
+    { to: "/monitoring", icon: <BarChart2 className="h-4 w-4" />, label: "Monitoring" },
+    { to: "/topics-queues", icon: <Folder className="h-4 w-4" />, label: "Topics & Queues" },
+    { to: "/message-archive", icon: <Archive className="h-4 w-4" />, label: "Archive" },
+    { to: "/docs", icon: <BookOpen className="h-4 w-4" />, label: "Documentation" },
+  ];
+
+  // Only show settings for admin
+  if (user?.role === 'admin') {
+    navLinks.push({ to: "/settings", icon: <Settings className="h-4 w-4" />, label: "Settings" });
+  }
   
   return (
     <motion.header
@@ -31,49 +46,52 @@ const Header: React.FC = () => {
             </span>
           </Link>
         </div>
+        
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           {isAuthenticated && (
-            <nav className="flex items-center space-x-2">
-              <Link to="/broker-info">
-                <Button variant="ghost" size="sm" className="h-8 gap-1">
-                  <Info className="h-4 w-4" />
-                  <span>Broker Info</span>
-                </Button>
-              </Link>
-              <Link to="/monitoring">
-                <Button variant="ghost" size="sm" className="h-8 gap-1">
-                  <BarChart2 className="h-4 w-4" />
-                  <span>Monitoring</span>
-                </Button>
-              </Link>
-              <Link to="/topics-queues">
-                <Button variant="ghost" size="sm" className="h-8 gap-1">
-                  <Folder className="h-4 w-4" />
-                  <span>Topics & Queues</span>
-                </Button>
-              </Link>
-              <Link to="/message-archive">
-                <Button variant="ghost" size="sm" className="h-8 gap-1">
-                  <Archive className="h-4 w-4" />
-                  <span>Archive</span>
-                </Button>
-              </Link>
-              <Link to="/docs">
-                <Button variant="ghost" size="sm" className="h-8 gap-1">
-                  <BookOpen className="h-4 w-4" />
-                  <span>Documentation</span>
-                </Button>
-              </Link>
-              {user?.role === 'admin' && (
-                <Link to="/settings">
-                  <Button variant="ghost" size="sm" className="h-8 gap-1">
-                    <Settings className="h-4 w-4" />
-                    <span>Settings</span>
-                  </Button>
-                </Link>
-              )}
-            </nav>
+            <>
+              {/* Desktop Navigation */}
+              <nav className="hidden md:flex items-center space-x-2">
+                {navLinks.map((link) => (
+                  <Link key={link.to} to={link.to}>
+                    <Button variant="ghost" size="sm" className="h-8 gap-1">
+                      {link.icon}
+                      <span>{link.label}</span>
+                    </Button>
+                  </Link>
+                ))}
+              </nav>
+              
+              {/* Mobile Navigation */}
+              <div className="md:hidden flex flex-1 justify-end">
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 md:hidden">
+                      <Menu className="h-5 w-5" />
+                      <span className="sr-only">Toggle menu</span>
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-[240px] sm:w-[300px]">
+                    <div className="flex flex-col py-6">
+                      <Link to="/" className="flex items-center gap-2 mb-6">
+                        <MessageSquare className="h-5 w-5" />
+                        <span className="font-bold">Messaging System</span>
+                      </Link>
+                      <nav className="flex flex-col space-y-3">
+                        {navLinks.map((link) => (
+                          <Link key={link.to} to={link.to} className="flex items-center gap-2 py-2 px-3 rounded-md hover:bg-secondary">
+                            {link.icon}
+                            <span>{link.label}</span>
+                          </Link>
+                        ))}
+                      </nav>
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
+            </>
           )}
+          
           <div className="flex items-center gap-2">
             <UserProfileMenu />
             <Tooltip>

@@ -1,8 +1,10 @@
 
 #root {
   width: 100%;
+  max-width: 100vw;
   margin: 0 auto;
   text-align: center;
+  overflow-x: hidden;
 }
 
 .logo {
@@ -46,6 +48,11 @@
   .hide-on-mobile {
     display: none;
   }
+  
+  .container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
 }
 
 @media (max-width: 768px) {
@@ -53,4 +60,19 @@
     padding-left: 1rem;
     padding-right: 1rem;
   }
+  
+  body, html {
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+  }
+}
+
+/* Force body to take full width but prevent overflow */
+body {
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  position: relative;
 }

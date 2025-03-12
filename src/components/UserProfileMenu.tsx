@@ -27,11 +27,11 @@ const UserProfileMenu: React.FC = () => {
 
   if (!isAuthenticated || !user) {
     return (
-      <div className="flex items-center gap-2">
-        <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm h-8">
+      <div className="flex items-center gap-1 sm:gap-2">
+        <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm h-8 px-2 sm:px-4">
           <Link to="/login">Login</Link>
         </Button>
-        <Button size="sm" asChild className="text-xs sm:text-sm h-8">
+        <Button size="sm" asChild className="text-xs sm:text-sm h-8 px-2 sm:px-4">
           <Link to="/register">Sign Up</Link>
         </Button>
       </div>
@@ -58,11 +58,11 @@ const UserProfileMenu: React.FC = () => {
           <span className="sr-only">Toggle user menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" className="w-[200px] sm:w-56">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm sm:text-base font-medium">{user.username}</p>
-            <p className="text-xs text-muted-foreground">{user.email}</p>
+            <p className="text-xs text-muted-foreground truncate">{user.email}</p>
             <div className="flex items-center mt-1">
               <Badge variant={user.role === 'admin' ? 'default' : 'secondary'} className="text-xs">
                 {user.role}
