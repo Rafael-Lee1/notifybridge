@@ -115,3 +115,46 @@ svg {
   margin-bottom: 1.5rem;
   width: 100%;
 }
+
+/* Add extra small breakpoint for phone sizes */
+@media (min-width: 480px) {
+  .xs\:flex-row {
+    flex-direction: row;
+  }
+  
+  .xs\:items-center {
+    align-items: center;
+  }
+  
+  .xs\:self-auto {
+    align-self: auto;
+  }
+  
+  .xs\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Chart responsive styles */
+@media (max-width: 480px) {
+  .recharts-wrapper .recharts-cartesian-grid-horizontal line,
+  .recharts-wrapper .recharts-cartesian-grid-vertical line {
+    stroke-opacity: 0.2;
+  }
+  
+  .recharts-wrapper .recharts-cartesian-axis-tick-value {
+    font-size: 8px;
+  }
+  
+  .recharts-tooltip-wrapper {
+    max-width: 80vw;
+  }
+}
+
+/* Touch-friendly buttons for mobile */
+@media (max-width: 640px) {
+  button {
+    min-height: 36px;
+    min-width: 36px;
+  }
+}

@@ -127,21 +127,21 @@ const MessagingMetrics: React.FC<MessagingMetricsProps> = ({
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
       className={cn(
-        "rounded-lg border bg-background p-4",
+        "rounded-lg border bg-background p-3 md:p-4 overflow-hidden",
         className
       )}
     >
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <BarChart2 className="w-5 h-5 text-primary" />
-          <h2 className="text-lg font-semibold">Messaging Metrics</h2>
+      <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between mb-3 md:mb-4 gap-2">
+        <div className="flex items-center gap-1 md:gap-2">
+          <BarChart2 className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+          <h2 className="text-base md:text-lg font-semibold">Messaging Metrics</h2>
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 md:gap-2 self-end xs:self-auto">
           <Button
             variant="outline"
             size="sm"
-            className="h-8 text-xs"
+            className="h-7 md:h-8 text-xs"
             onClick={() => {
               const currentViewPeriod = viewPeriod;
               setViewPeriod('1h');
@@ -158,13 +158,13 @@ const MessagingMetrics: React.FC<MessagingMetricsProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Messages Produced</CardTitle>
+      <div className="grid grid-cols-1 xs:grid-cols-3 gap-2 md:gap-4 mb-4 md:mb-6">
+        <Card className="overflow-hidden">
+          <CardHeader className="pb-1 md:pb-2">
+            <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground">Messages Produced</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{producerMessages.length}</div>
+            <div className="text-lg md:text-2xl font-bold">{producerMessages.length}</div>
             <p className="text-xs text-muted-foreground mt-1 flex items-center">
               <Activity className="w-3 h-3 mr-1" />
               {rates.producerPerMinute}/min (avg: {rates.producerAvgPerMinute}/min)
@@ -172,12 +172,12 @@ const MessagingMetrics: React.FC<MessagingMetricsProps> = ({
           </CardContent>
         </Card>
         
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Messages Consumed</CardTitle>
+        <Card className="overflow-hidden">
+          <CardHeader className="pb-1 md:pb-2">
+            <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground">Messages Consumed</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{consumerMessages.length}</div>
+            <div className="text-lg md:text-2xl font-bold">{consumerMessages.length}</div>
             <p className="text-xs text-muted-foreground mt-1 flex items-center">
               <Activity className="w-3 h-3 mr-1" />
               {rates.consumerPerMinute}/min (avg: {rates.consumerAvgPerMinute}/min)
@@ -185,25 +185,25 @@ const MessagingMetrics: React.FC<MessagingMetricsProps> = ({
           </CardContent>
         </Card>
         
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Queue Depth</CardTitle>
+        <Card className="overflow-hidden">
+          <CardHeader className="pb-1 md:pb-2">
+            <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground">Queue Depth</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{queuedMessages.length}</div>
+            <div className="text-lg md:text-2xl font-bold">{queuedMessages.length}</div>
             <p className="text-xs text-muted-foreground mt-1 flex items-center">
               <Clock className="w-3 h-3 mr-1" />
-              {queuedMessages.length > 0 ? "Messages pending consumption" : "Queue empty"}
+              {queuedMessages.length > 0 ? "Messages pending" : "Queue empty"}
             </p>
           </CardContent>
         </Card>
       </div>
       
       <Tabs defaultValue="throughput" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-4">
-          <TabsTrigger value="throughput">Throughput</TabsTrigger>
-          <TabsTrigger value="queue">Queue Depth</TabsTrigger>
-          <TabsTrigger value="comparison">Producer vs Consumer</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 mb-2 md:mb-4">
+          <TabsTrigger value="throughput" className="text-xs md:text-sm">Throughput</TabsTrigger>
+          <TabsTrigger value="queue" className="text-xs md:text-sm">Queue Depth</TabsTrigger>
+          <TabsTrigger value="comparison" className="text-xs md:text-sm">Compare</TabsTrigger>
         </TabsList>
         
         <div className="mb-2 flex justify-end">
@@ -211,7 +211,7 @@ const MessagingMetrics: React.FC<MessagingMetricsProps> = ({
             <Button
               variant={viewPeriod === '1h' ? "secondary" : "ghost"}
               size="sm"
-              className="h-7 px-2 text-xs rounded-none"
+              className="h-6 md:h-7 px-2 text-xs rounded-none"
               onClick={() => setViewPeriod('1h')}
             >
               1h
@@ -219,7 +219,7 @@ const MessagingMetrics: React.FC<MessagingMetricsProps> = ({
             <Button
               variant={viewPeriod === '24h' ? "secondary" : "ghost"}
               size="sm"
-              className="h-7 px-2 text-xs rounded-none"
+              className="h-6 md:h-7 px-2 text-xs rounded-none"
               onClick={() => setViewPeriod('24h')}
             >
               24h
@@ -227,7 +227,7 @@ const MessagingMetrics: React.FC<MessagingMetricsProps> = ({
             <Button
               variant={viewPeriod === '7d' ? "secondary" : "ghost"}
               size="sm"
-              className="h-7 px-2 text-xs rounded-none"
+              className="h-6 md:h-7 px-2 text-xs rounded-none"
               onClick={() => setViewPeriod('7d')}
             >
               7d
@@ -235,76 +235,97 @@ const MessagingMetrics: React.FC<MessagingMetricsProps> = ({
           </div>
         </div>
         
-        <TabsContent value="throughput" className="h-64">
+        <TabsContent value="throughput" className="h-48 md:h-64">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={chartData}
-              margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+              margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
             >
               <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
               <XAxis 
                 dataKey="timestamp" 
                 tickFormatter={formatTimestamp}
                 stroke="#888888"
-                fontSize={12}
-                tickMargin={10}
+                fontSize={10}
+                tickMargin={5}
+                tick={{ fontSize: 10 }}
               />
-              <YAxis stroke="#888888" fontSize={12} />
+              <YAxis 
+                stroke="#888888" 
+                fontSize={10}
+                width={25}
+                tickFormatter={(value) => value}
+              />
               <Tooltip
-                formatter={(value) => [`${value} messages`, '']}
-                labelFormatter={(label) => `Time: ${new Date(label).toLocaleTimeString()}`}
+                formatter={(value) => [`${value} msgs`, '']}
+                labelFormatter={(label) => `${new Date(label).toLocaleTimeString()}`}
+                contentStyle={{ fontSize: '12px' }}
               />
-              <Line type="monotone" dataKey="producerCount" stroke="#2563eb" name="Produced" />
-              <Line type="monotone" dataKey="consumerCount" stroke="#16a34a" name="Consumed" />
+              <Line type="monotone" dataKey="producerCount" stroke="#2563eb" name="Produced" strokeWidth={1.5} dot={{ r: 2 }} />
+              <Line type="monotone" dataKey="consumerCount" stroke="#16a34a" name="Consumed" strokeWidth={1.5} dot={{ r: 2 }} />
             </LineChart>
           </ResponsiveContainer>
         </TabsContent>
         
-        <TabsContent value="queue" className="h-64">
+        <TabsContent value="queue" className="h-48 md:h-64">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={chartData}
-              margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+              margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
             >
               <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
               <XAxis 
                 dataKey="timestamp" 
                 tickFormatter={formatTimestamp}
                 stroke="#888888"
-                fontSize={12}
-                tickMargin={10}
+                fontSize={10}
+                tickMargin={5}
+                tick={{ fontSize: 10 }}
               />
-              <YAxis stroke="#888888" fontSize={12} />
+              <YAxis 
+                stroke="#888888" 
+                fontSize={10}
+                width={25}
+                tickFormatter={(value) => value}
+              />
               <Tooltip
-                formatter={(value) => [`${value} messages`, '']}
-                labelFormatter={(label) => `Time: ${new Date(label).toLocaleTimeString()}`}
+                formatter={(value) => [`${value} msgs`, '']}
+                labelFormatter={(label) => `${new Date(label).toLocaleTimeString()}`}
+                contentStyle={{ fontSize: '12px' }}
               />
-              <Line type="monotone" dataKey="queueDepth" stroke="#d97706" strokeWidth={2} name="Queue Depth" />
+              <Line type="monotone" dataKey="queueDepth" stroke="#d97706" strokeWidth={2} name="Queue Depth" dot={{ r: 2 }} />
             </LineChart>
           </ResponsiveContainer>
         </TabsContent>
         
-        <TabsContent value="comparison" className="h-64">
+        <TabsContent value="comparison" className="h-48 md:h-64">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={chartData}
-              margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+              margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
             >
               <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
               <XAxis 
                 dataKey="timestamp" 
                 tickFormatter={formatTimestamp}
                 stroke="#888888"
-                fontSize={12}
-                tickMargin={10}
+                fontSize={10}
+                tickMargin={5}
+                tick={{ fontSize: 10 }}
               />
-              <YAxis stroke="#888888" fontSize={12} />
+              <YAxis 
+                stroke="#888888" 
+                fontSize={10}
+                width={25}
+                tickFormatter={(value) => value}
+              />
               <Tooltip
-                formatter={(value) => [`${value} messages`, '']}
-                labelFormatter={(label) => `Time: ${new Date(label).toLocaleTimeString()}`}
+                formatter={(value) => [`${value} msgs`, '']}
+                labelFormatter={(label) => `${new Date(label).toLocaleTimeString()}`}
+                contentStyle={{ fontSize: '12px' }}
               />
-              <Bar dataKey="producerCount" fill="#2563eb" name="Produced" />
-              <Bar dataKey="consumerCount" fill="#16a34a" name="Consumed" />
+              <Bar dataKey="producerCount" fill="#2563eb" name="Produced" barSize={6} />
+              <Bar dataKey="consumerCount" fill="#16a34a" name="Consumed" barSize={6} />
             </BarChart>
           </ResponsiveContainer>
         </TabsContent>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -159,110 +158,115 @@ const MonitoringDashboard: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="flex-1 container max-w-7xl py-6">
+      <main className="flex-1 container max-w-7xl py-4 px-2 sm:px-4 md:py-6 overflow-hidden">
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="mb-6"
+          className="mb-4 md:mb-6 w-full"
         >
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 md:mb-6">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">Monitoring Dashboard</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Monitoring Dashboard</h1>
+              <p className="text-sm md:text-base text-muted-foreground">
                 Real-time metrics and insights for your messaging system
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <p className="text-sm text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-xs sm:text-sm text-muted-foreground mr-1">
                 Last updated: {lastUpdated.toLocaleTimeString()}
               </p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleRefresh}
-                className="flex items-center gap-1"
-              >
-                <RefreshCcw className="h-3.5 w-3.5" />
-                Refresh
-              </Button>
-              <Button
-                variant={autoRefresh ? "default" : "outline"}
-                size="sm"
-                onClick={() => setAutoRefresh(!autoRefresh)}
-                className="flex items-center gap-1"
-              >
-                <AlarmClock className="h-3.5 w-3.5" />
-                {autoRefresh ? "Auto-refresh On" : "Auto-refresh Off"}
-              </Button>
+              <div className="flex gap-2 flex-wrap">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRefresh}
+                  className="flex items-center gap-1 text-xs h-8"
+                >
+                  <RefreshCcw className="h-3 w-3" />
+                  <span className="hidden sm:inline">Refresh</span>
+                </Button>
+                <Button
+                  variant={autoRefresh ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setAutoRefresh(!autoRefresh)}
+                  className="flex items-center gap-1 text-xs h-8"
+                >
+                  <AlarmClock className="h-3 w-3" />
+                  <span className="hidden sm:inline">{autoRefresh ? "Auto-refresh On" : "Auto-refresh Off"}</span>
+                  <span className="sm:hidden">{autoRefresh ? "Auto" : "Manual"}</span>
+                </Button>
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">CPU Usage</CardTitle>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-6">
+            <Card className="overflow-hidden">
+              <CardHeader className="pb-1 md:pb-2">
+                <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground">CPU Usage</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center">
-                  <Cpu className="w-4 h-4 mr-2 text-muted-foreground" />
-                  <div className="text-2xl font-bold">{systemStats.cpu}%</div>
+                  <Cpu className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 text-muted-foreground" />
+                  <div className="text-base md:text-2xl font-bold">{systemStats.cpu}%</div>
                 </div>
               </CardContent>
             </Card>
             
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Memory Usage</CardTitle>
+            <Card className="overflow-hidden">
+              <CardHeader className="pb-1 md:pb-2">
+                <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground">Memory Usage</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center">
-                  <Server className="w-4 h-4 mr-2 text-muted-foreground" />
-                  <div className="text-2xl font-bold">{systemStats.memory}%</div>
+                  <Server className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 text-muted-foreground" />
+                  <div className="text-base md:text-2xl font-bold">{systemStats.memory}%</div>
                 </div>
               </CardContent>
             </Card>
             
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Network I/O</CardTitle>
+            <Card className="overflow-hidden">
+              <CardHeader className="pb-1 md:pb-2">
+                <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground">Network I/O</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center">
-                  <ArrowDownUp className="w-4 h-4 mr-2 text-muted-foreground" />
-                  <div className="text-2xl font-bold">{systemStats.network} KB/s</div>
+                  <ArrowDownUp className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 text-muted-foreground" />
+                  <div className="text-base md:text-2xl font-bold">{systemStats.network} KB/s</div>
                 </div>
               </CardContent>
             </Card>
             
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Active Connections</CardTitle>
+            <Card className="overflow-hidden">
+              <CardHeader className="pb-1 md:pb-2">
+                <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground">Active Connections</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center">
-                  <Activity className="w-4 h-4 mr-2 text-muted-foreground" />
-                  <div className="text-2xl font-bold">{systemStats.activeConnections}</div>
+                  <Activity className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 text-muted-foreground" />
+                  <div className="text-base md:text-2xl font-bold">{systemStats.activeConnections}</div>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          <MessagingMetrics 
-            producerMessages={producerMessages} 
-            consumerMessages={consumerMessages} 
-            queuedMessages={queuedMessages}
-            className="mb-6"
-          />
+          <div className="overflow-hidden mb-6">
+            <MessagingMetrics 
+              producerMessages={producerMessages} 
+              consumerMessages={consumerMessages} 
+              queuedMessages={queuedMessages}
+              className="mb-6"
+            />
+          </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>System Information</CardTitle>
-                <CardDescription>Overall system health and configuration</CardDescription>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <Card className="overflow-hidden">
+              <CardHeader className="pb-2 md:pb-4">
+                <CardTitle className="text-base md:text-lg">System Information</CardTitle>
+                <CardDescription className="text-xs md:text-sm">Overall system health and configuration</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-3 md:space-y-4 text-sm">
                   <div className="flex justify-between items-center border-b pb-2">
                     <span className="text-muted-foreground">Uptime</span>
                     <span className="font-medium">{systemStats.uptime}</span>
@@ -287,13 +291,13 @@ const MonitoringDashboard: React.FC = () => {
               </CardContent>
             </Card>
             
-            <Card>
-              <CardHeader>
-                <CardTitle>Message Rates</CardTitle>
-                <CardDescription>Current throughput statistics</CardDescription>
+            <Card className="overflow-hidden">
+              <CardHeader className="pb-2 md:pb-4">
+                <CardTitle className="text-base md:text-lg">Message Rates</CardTitle>
+                <CardDescription className="text-xs md:text-sm">Current throughput statistics</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-3 md:space-y-4 text-sm">
                   <div className="flex justify-between items-center border-b pb-2">
                     <span className="text-muted-foreground">Published (avg/min)</span>
                     <span className="font-medium">{Math.floor(Math.random() * 50) + 20}</span>
